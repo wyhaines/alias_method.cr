@@ -1,2 +1,39 @@
-# alias_method.cr
-Crystal does not provide a ready-to-use mechanism for creating method aliases, and the general Crystal code style recommendation is that one should avoid having multiple names that invoke the same method. However, there are times where creating method aliases is useful. This shard creates an alias_method macro that can be used to easily create method aliases which are functionally identical to the original method.
+# alias_method
+
+TODO: Write a description here
+
+## Installation
+
+1. Add the dependency to your `shard.yml`:
+
+   ```yaml
+   dependencies:
+     alias_method:
+       github: your-github-user/alias_method
+   ```
+
+2. Run `shards install`
+
+## Usage
+
+```crystal
+require "alias_method"
+```
+
+TODO: Write usage instructions here
+
+## Development
+
+TODO: Write development instructions here
+
+## Contributing
+
+1. Fork it (<https://github.com/your-github-user/alias_method/fork>)
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
+## Contributors
+
+- [Kirk Haines](https://github.com/your-github-user) - creator and maintainer
