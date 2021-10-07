@@ -51,5 +51,5 @@ class AliasTestClass
   alias_method("new_with_capture", "with_capture")
   alias_method("new_with_arg_and_capture", "with_arg_and_capture")
   alias_method("new_with_arg_and_capture_and_return_type", "with_arg_and_capture_and_return_type")
-  alias_method("new_with_yield", "with_yield")
+  alias_method("new_with_yield", "with_yield", 1)
 end

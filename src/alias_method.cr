@@ -3,7 +3,7 @@ module AliasMethod
 end
 
 # This macro aliases a given method name to a new name.
-macro alias_method(to, from)
+macro alias_method(to, from, yield_arity = 0)
   {% puts "Aliasing #{from} -> #{to}" %}
   {% method_name = nil %}
   {%
@@ -106,7 +106,10 @@ macro alias_method(to, from)
     block_arg_ary = [] of String
     block_arg_list = ""
     block_call_list = ""
-    if method.accepts_block? && method.block_arg
+    block_type = nil
+    if method.accepts_block?
+      block_type = method.block_arg ? "block" : "yield"
+    
       # If you are reading this code, the block below is because we need
       # construct a list of variable names, for any block arity that the
       # code might encounter, but the macro language doesn't give us many
@@ -117,7 +120,9 @@ macro alias_method(to, from)
       left = method.block_arg.id.gsub(/[\w\d_]+\s+:\s+.\s*/ ,"").split("->")[0].id
       puts left
       puts left.split(",").reject {|arg| arg.empty?}
-      block_arg_arity = left.split(",").reject {|arg| arg.empty?}.size - 1
+      block_arg_arity = block_type == "block" ?
+        ( left.split(",").reject {|arg| arg.empty?}.size - 1 ) :
+        ( yield_arity - 1 )
       puts block_arg_arity
 
       if block_arg_arity > -1
@@ -160,11 +165,46 @@ macro alias_method(to, from)
 
   # Create the aliases.
   {{ method.visibility.id == "public" ? "".id : method.visibility.id }} def {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ method_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method_args.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id }}
-    {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ new_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method.args.map {|m| m.name.id}.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.accepts_block? ? "{#{block_arg_list.id} block.call(#{block_call_list.id})}".id : "".id }}
+    {{
+      receiver == @type ?
+        "".id :
+        "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id
+    }}{{
+      new_name.id
+    }}{{
+      !method_args.empty? ? "(".id : "".id
+    }}{{
+      method.args.map {|m| m.name.id}.join(", ").id
+    }}{{
+      !method_args.empty? ? ")".id : "".id
+    }}{{
+      method.accepts_block? ?
+        "{#{block_arg_list.id} block.call(#{block_call_list.id})}".id :
+        "".id
+    }}
   end
   
   {{ method.visibility.id == "public" ? "".id : method.visibility.id }} def {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ to_method_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method_args.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id }}
-    {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ new_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method.args.map {|m| m.name.id}.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.accepts_block? ? "{#{block_arg_list.id} block.call(#{block_call_list.id})}".id : "".id }}
+    {{
+      receiver == @type ?
+        "".id :
+        "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id
+    }}{{
+      new_name.id
+    }}{{
+      !method_args.empty? ? "(".id : "".id
+    }}{{
+      method.args.map {|m| m.name.id}.join(", ").id
+    }}{{
+      !method_args.empty? ? ")".id : "".id
+    }}{{
+      method.accepts_block? ?
+        ( block_type == "block" ?
+          "{#{block_arg_list.id} block.call(#{block_call_list.id})}".id :
+          "{#{block_arg_list.id} yield(#{block_call_list.id})}".id
+        ) :
+        "".id
+    }}
   end
 
   {% end %}
