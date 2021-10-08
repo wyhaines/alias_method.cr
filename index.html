@@ -115,6 +115,8 @@
 
 <p>The <code><a href="toplevel.html#alias_method(to,from,yield_arity=0)-macro">alias_method(to, from, yield_arity)</a></code> macro is used to create method aliases. For most usage, only the <code>to</code> and the <code>from</code> arguments are required. The <code>yield_arity</code> argument is optional, only applies when aliasing a method that yields, and defaults to <code>0</code>.</p>
 
+<p>When a method contains a <code>yield</code> statement, that method accepts a block. However, because the block is not captured, the macro does not know what the expected call signature of the block is. So, when it constructs the block forwarding code, it has no way of knowing how many arguments the code expects the block to have. So, when aliasing methods that yield, one must provide that arity information to the macro if the arity is anything other than zero.</p>
+
 <pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
   <span class="k">def</span> <span class="m">self</span>.add(x, y)
     x <span class="o">+</span> y

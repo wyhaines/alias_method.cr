@@ -129,7 +129,7 @@
       <li class="entry-summary">
         <a href="#alias_method(to,from,yield_arity=0)-macro" class="signature"><strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>)</a>
         
-          <div class="summary"><p>This macro aliases a given method name to a new name.</p></div>
+          <div class="summary"><p>The <code><a href="toplevel.html#alias_method(to,from,yield_arity=0)-macro">alias_method(to, from, yield_arity)</a></code> macro is used to create method aliases.</p></div>
         
       </li>
     
@@ -174,7 +174,10 @@
       
         <div class="doc">
           
-          <p>This macro aliases a given method name to a new name.</p>
+          <p>The <code><a href="toplevel.html#alias_method(to,from,yield_arity=0)-macro">alias_method(to, from, yield_arity)</a></code> macro is used to create method
+aliases. For most usage, only the <code>to</code> and the <code>from</code> arguments are
+required. The <code>yield_arity</code> argument is optional, only applies when
+aliasing a method that yields, and defaults to <code>0</code>.</p>
 
 <p>When a method contains a <code>yield</code> statement, that method accepts a block.
 However, because the block is not captured, the macro does not know what
@@ -183,12 +186,48 @@ block forwarding code, it has no way of knowing how many arguments the
 code expects the block to have. So, when aliasing methods that yield, one
 must provide that arity information to the macro if the arity is anything
 other than zero.</p>
+
+<p>class MyClass
+  def self.add(x, y)</p>
+
+<pre><code class="language-crystal">x <span class="o">+</span> y</code></pre>
+
+<p>end</p>
+
+<p>def with(arg)</p>
+
+<pre><code class="language-crystal"><span class="k">yield</span> arg</code></pre>
+
+<p>end</p>
+
+<p># Spanish translations of the method names:
+  alias_method "suma", "self.add", 1
+  alias_method "con", "with"
+end</p>
+
+<p>foo = Foo.new</p>
+
+<p>puts Foo.suma(123, 456)
+puts(foo.con(7) do |x|
+  x ** x
+end)</p>
+
+<pre><code class="language-crystal">
+<span class="t">The</span> <span class="k">macro</span> will not throw any errors <span class="k">if</span> the method being aliased can not be
+found.
+</code></pre>
+
+<p>class MyClass
+  alias_method "nada", "nothing"
+end</p>
+
+<pre><code class="language-crystal"></code></pre>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/ccd9ad638608495ebe32df538daebf582478e6aa/src/alias_method.cr#L17" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/1027459b7e204d95c454cc01d00bbf9ec765910d/src/alias_method.cr#L53" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -206,12 +245,14 @@ other than zero.</p>
           <p>This macro removes a method. It is not possible to actually undefined
 a method in Crystal, so this macro redefines the method to return, at
 runtime, a NoMethodError exception.</p>
+
+<p>Method removal works on both class methods and instance methods.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/ccd9ad638608495ebe32df538daebf582478e6aa/src/alias_method.cr#L269" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/1027459b7e204d95c454cc01d00bbf9ec765910d/src/alias_method.cr#L307" target="_blank">View source</a>]
         
       </div>
     </div>
