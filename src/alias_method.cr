@@ -239,7 +239,7 @@ macro alias_method(to, from, yield_arity = 0)
     }}{{
       !method_args.empty? ? "(".id : "".id
     }}{{
-      method.args.map {|m| m.name.id}.join(", ").id
+      method_args.map {|m| m.name.id}.join(", ").id
     }}{{
       !method_args.empty? ? ")".id : "".id
     }}{{
