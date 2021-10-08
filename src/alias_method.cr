@@ -91,7 +91,7 @@ macro alias_method(to, from, yield_arity = 0)
   {% for method in methods %}
   {%
     method_args = method.args
-    method_arg_names = method.args.map { |a| a.name.id }
+    method_arg_names = method.args.map &.name.id
     if method.accepts_block? && method.block_arg
       block_arg = "&#{method.block_arg.id}".id
       block_arg_name = "&#{method.block_arg.name.id}"
@@ -119,7 +119,7 @@ macro alias_method(to, from, yield_arity = 0)
       # tools to do this. So, we have to do it gross. If you can think of
       # a better way to do this, please let me know.
       left = method.block_arg.id.gsub(/[\w\d_]+\s+:\s+.\s*/, "").split("->")[0].id
-      block_arg_arity = block_type == "block" ? (left.split(",").reject { |arg| arg.empty? }.size - 1) : (yield_arity - 1)
+      block_arg_arity = block_type == "block" ? (left.split(",").reject(&.empty?).size - 1) : (yield_arity - 1)
 
       if block_arg_arity > -1
         letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
@@ -199,7 +199,7 @@ macro alias_method(to, from, yield_arity = 0)
                 method.accepts_block? && (block_type == "yield") ? "{#{block_arg_list.id} yield(#{block_call_list.id})}".id : "".id
               }}
   end
-  
+
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
@@ -283,7 +283,7 @@ macro remove_method(from)
   {% for method in methods %}
   {%
     method_args = method.args
-    method_arg_names = method.args.map { |a| a.name.id }
+    method_arg_names = method.args.map &.name.id
     if method.accepts_block? && method.block_arg
       block_arg = "&#{method.block_arg.id}".id
       block_arg_name = "&#{method.block_arg.name.id}"
@@ -311,7 +311,7 @@ macro remove_method(from)
       # tools to do this. So, we have to do it gross. If you can think of
       # a better way to do this, please let me know.
       left = method.block_arg.id.gsub(/[\w\d_]+\s+:\s+.\s*/, "").split("->")[0].id
-      block_arg_arity = block_type == "block" ? (left.split(",").reject { |arg| arg.empty? }.size - 1) : (yield_arity - 1)
+      block_arg_arity = block_type == "block" ? (left.split(",").reject(&.empty?).size - 1) : (yield_arity - 1)
 
       if block_arg_arity > -1
         letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
@@ -335,7 +335,7 @@ macro remove_method(from)
       end
     end
   %}
-    
+
   # Redefine the method to simply raise.
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
