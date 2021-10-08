@@ -2,10 +2,15 @@ module AliasMethod
   VERSION = "0.1.0"
 end
 
+# This exception will be thrown if a method that has been removed via
+# the `remove_method` macro is called.
 class NoMethodError < Exception
 end
 
-# This macro aliases a given method name to a new name.
+# The `alias_method(to, from, yield_arity)` macro is used to create method
+# aliases. For most usage, only the `to` and the `from` arguments are
+# required. The `yield_arity` argument is optional, only applies when
+# aliasing a method that yields, and defaults to `0`.
 #
 # When a method contains a `yield` statement, that method accepts a block.
 # However, because the block is not captured, the macro does not know what
@@ -14,6 +19,37 @@ end
 # code expects the block to have. So, when aliasing methods that yield, one
 # must provide that arity information to the macro if the arity is anything
 # other than zero.
+#
+# class MyClass
+#   def self.add(x, y)
+#     x + y
+#   end
+#
+#   def with(arg)
+#     yield arg
+#   end
+#
+#   # Spanish translations of the method names:
+#   alias_method "suma", "self.add", 1
+#   alias_method "con", "with"
+# end
+#
+# foo = Foo.new
+#
+# puts Foo.suma(123, 456)
+# puts(foo.con(7) do |x|
+#   x ** x
+# end)
+# ```
+#
+# The macro will not throw any errors if the method being aliased can not be
+# found.
+#
+# ```crystal
+# class MyClass
+#   alias_method "nada", "nothing"
+# end
+# ```
 macro alias_method(to, from, yield_arity = 0)
   {% method_name = nil %}
   {% # Figure out where the method lives....
@@ -266,6 +302,8 @@ end
 # This macro removes a method. It is not possible to actually undefined
 # a method in Crystal, so this macro redefines the method to return, at
 # runtime, a NoMethodError exception.
+#
+# Method removal works on both class methods and instance methods.
 macro remove_method(from)
   {% method_name = nil %}
   {% # Figure out where the method lives....
