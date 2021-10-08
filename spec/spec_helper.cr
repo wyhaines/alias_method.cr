@@ -19,11 +19,11 @@ class AliasTestClass
   end
 
   def with_typed_args(one : String, two : String)
-    { one => two }
+    {one => two}
   end
 
   def with_typed_args_and_return_type(one : String, two : String) : Hash(String, String)
-    { one => two }
+    {one => two}
   end
 
   def with_capture(&block : -> Int32)
@@ -42,6 +42,10 @@ class AliasTestClass
     yield arg
   end
 
+  def bare_and_remove
+    "There can be only one."
+  end
+
   alias_method("new_bare", "bare")
   alias_method("new_bare_with_return_type", "bare_with_return_type")
   alias_method("new_with_args", "with_args")
@@ -52,4 +56,7 @@ class AliasTestClass
   alias_method("new_with_arg_and_capture", "with_arg_and_capture")
   alias_method("new_with_arg_and_capture_and_return_type", "with_arg_and_capture_and_return_type")
   alias_method("new_with_yield", "with_yield", 1)
+
+  alias_method("new_bare_and_remove", "bare_and_remove")
+  remove_method("bare_and_remove")
 end

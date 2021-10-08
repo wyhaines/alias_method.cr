@@ -18,7 +18,7 @@ describe AliasMethod do
 
   it "can alias a method that takes simple arguments" do
     test = AliasTestClass.new
-    
+
     test.with_args(1, 3).should eq [1, 3]
     test.new_with_args(1, 3).should eq [1, 3]
   end
@@ -56,21 +56,30 @@ describe AliasMethod do
   it "can alias a method that captures a block and has a typed return value" do
     test = AliasTestClass.new
 
-    test.with_arg_and_capture(7) {|x| x*x }.should eq 49
-    test.new_with_arg_and_capture(8) {|x| x*x }.should eq 64
+    test.with_arg_and_capture(7) { |x| x*x }.should eq 49
+    test.new_with_arg_and_capture(8) { |x| x*x }.should eq 64
   end
 
   it "can alias a method that captures a block and has a typed return value" do
     test = AliasTestClass.new
 
-    test.with_arg_and_capture_and_return_type(7) {|x| x*x }.should eq 49
-    test.new_with_arg_and_capture_and_return_type(8) {|x| x*x }.should eq 64
+    test.with_arg_and_capture_and_return_type(7) { |x| x*x }.should eq 49
+    test.new_with_arg_and_capture_and_return_type(8) { |x| x*x }.should eq 64
   end
 
   it "can alias a method that yields" do
     test = AliasTestClass.new
 
-    test.with_yield(7) {|n| n * n }.should eq 49
-    test.new_with_yield(7) {|n| n * n }.should eq 49
+    test.with_yield(7) { |n| n * n }.should eq 49
+    test.new_with_yield(7) { |n| n * n }.should eq 49
+  end
+
+  it "can remove a method" do
+    test = AliasTestClass.new
+
+    test.new_bare_and_remove.should eq "There can be only one."
+    expect_raises(NoMethodError) do
+      test.bare_and_remove
+    end
   end
 end
