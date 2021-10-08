@@ -187,47 +187,39 @@ code expects the block to have. So, when aliasing methods that yield, one
 must provide that arity information to the macro if the arity is anything
 other than zero.</p>
 
-<p>class MyClass
-  def self.add(x, y)</p>
+<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
+  <span class="k">def</span> <span class="m">self</span>.add(x, y)
+    x <span class="o">+</span> y
+  <span class="k">end</span>
 
-<pre><code class="language-crystal">x <span class="o">+</span> y</code></pre>
+  <span class="k">def</span> <span class="m">with</span>(arg)
+    <span class="k">yield</span> arg
+  <span class="k">end</span>
 
-<p>end</p>
+  <span class="c"># Spanish translations of the method names:</span>
+  alias_method <span class="s">&quot;suma&quot;</span>, <span class="s">&quot;self.add&quot;</span>, <span class="n">1</span>
+  alias_method <span class="s">&quot;con&quot;</span>, <span class="s">&quot;with&quot;</span>
+<span class="k">end</span>
 
-<p>def with(arg)</p>
+foo <span class="o">=</span> <span class="t">Foo</span>.<span class="k">new</span>
 
-<pre><code class="language-crystal"><span class="k">yield</span> arg</code></pre>
+puts <span class="t">Foo</span>.suma(<span class="n">123</span>, <span class="n">456</span>)
+puts(foo.con(<span class="n">7</span>) <span class="k">do</span> <span class="o">|</span>x<span class="o">|</span>
+  x <span class="o">**</span> x
+<span class="k">end</span>)</code></pre>
 
-<p>end</p>
+<p>The macro will not throw any errors if the method being aliased can not be
+found.</p>
 
-<p># Spanish translations of the method names:
-  alias_method "suma", "self.add", 1
-  alias_method "con", "with"
-end</p>
-
-<p>foo = Foo.new</p>
-
-<p>puts Foo.suma(123, 456)
-puts(foo.con(7) do |x|
-  x ** x
-end)</p>
-
-<pre><code class="language-crystal">
-<span class="t">The</span> <span class="k">macro</span> will not throw any errors <span class="k">if</span> the method being aliased can not be
-found.
-</code></pre>
-
-<p>class MyClass
-  alias_method "nada", "nothing"
-end</p>
-
-<pre><code class="language-crystal"></code></pre>
+<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
+  alias_method <span class="s">&quot;nada&quot;</span>, <span class="s">&quot;nothing&quot;</span>
+<span class="k">end</span></code></pre>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/1027459b7e204d95c454cc01d00bbf9ec765910d/src/alias_method.cr#L53" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/7d46005ff634b2fac45e24c1dc4e37d4251103b8/src/alias_method.cr#L54" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -252,7 +244,7 @@ runtime, a NoMethodError exception.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/1027459b7e204d95c454cc01d00bbf9ec765910d/src/alias_method.cr#L307" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/7d46005ff634b2fac45e24c1dc4e37d4251103b8/src/alias_method.cr#L308" target="_blank">View source</a>]
         
       </div>
     </div>
