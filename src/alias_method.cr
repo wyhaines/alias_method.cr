@@ -115,25 +115,18 @@ macro alias_method(to, from, yield_arity = 0)
       # code might encounter, but the macro language doesn't give us many
       # tools to do this. So, we have to do it gross. If you can think of
       # a better way to do this, please let me know.
-      puts "-----"
-      puts method.block_arg.id
       left = method.block_arg.id.gsub(/[\w\d_]+\s+:\s+.\s*/ ,"").split("->")[0].id
-      puts left
-      puts left.split(",").reject {|arg| arg.empty?}
       block_arg_arity = block_type == "block" ?
         ( left.split(",").reject {|arg| arg.empty?}.size - 1 ) :
         ( yield_arity - 1 )
-      puts block_arg_arity
 
       if block_arg_arity > -1
         letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
         (0..block_arg_arity).each do |n|
-          puts "calculating #{n}"
           block_arg = ""
           work = n
           block_arg = letters[work % 26]
           work = (work // 26) - 1
-          puts "starting at: #{block_arg} -- #{work}"
           (0..3).each do
             if work >= 0
               block_arg = letters[work % 26] + block_arg
@@ -144,7 +137,6 @@ macro alias_method(to, from, yield_arity = 0)
           block_arg_ary << block_arg
         end
 
-        puts "Final ary: #{block_arg_ary}"
         block_call_list = block_arg_ary.join(", ").id
         block_arg_list = "|#{block_call_list}|"
       end
@@ -158,13 +150,46 @@ macro alias_method(to, from, yield_arity = 0)
     # original or the alias.
     new_name ||= "#{method.name.id}_#{method.column_number}X#{method.line_number}"
   %}
-  # Original method recreation.
-  {{ method.visibility.id == "public" ? "".id : method.visibility.id }} def {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ new_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method_args.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id }}
+  # Original method recreation, under a new name.
+  {{
+    method.visibility.id == "public" ? "".id : method.visibility.id
+  }} def {{
+    receiver == @type ?
+      "".id :
+      "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id
+  }}{{
+    new_name.id
+  }}{{
+    !method_args.empty? ? "(".id : "".id
+  }}{{
+    method_args.join(", ").id
+  }}{{
+    !method_args.empty? ? ")".id : "".id
+  }}{{
+    method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id
+  }}
   {{ method.body.id }}
   end
 
   # Create the aliases.
-  {{ method.visibility.id == "public" ? "".id : method.visibility.id }} def {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ method_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method_args.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id }}
+  {{
+    method.visibility.id == "public" ? "".id : method.visibility.id
+  }} def {{
+    receiver == @type ?
+      "".id :
+      "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id
+    }}{{
+      method_name.id
+    }}{{
+      !method_args.empty? ? "(".id : "".id
+    }}{{
+      method_args.join(", ").id
+    }}{{
+      !method_args.empty? ? ")".id : "".id
+    }}{{
+      method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id
+    }}
+    # Rewrite the original method.
     {{
       receiver == @type ?
         "".id :
@@ -179,12 +204,32 @@ macro alias_method(to, from, yield_arity = 0)
       !method_args.empty? ? ")".id : "".id
     }}{{
       method.accepts_block? ?
-        "{#{block_arg_list.id} block.call(#{block_call_list.id})}".id :
+        ( block_type == "block" ?
+          "{#{block_arg_list.id} block.call(#{block_call_list.id})}".id :
+          "{#{block_arg_list.id} yield(#{block_call_list.id})}".id
+        ) :
         "".id
     }}
   end
   
-  {{ method.visibility.id == "public" ? "".id : method.visibility.id }} def {{ receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id }}{{ to_method_name.id }}{{ !method_args.empty? ? "(".id : "".id }}{{ method_args.join(", ").id }}{{ !method_args.empty? ? ")".id : "".id }}{{ method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id }}
+  {{
+    method.visibility.id == "public" ? "".id : method.visibility.id
+  }} def {{
+    receiver == @type ?
+      "".id :
+      "#{receiver.id.gsub(/\.class/,"").gsub(/:Module/,"")}.".id
+    }}{{
+      to_method_name.id
+    }}{{
+      !method_args.empty? ? "(".id : "".id
+    }}{{
+      method_args.join(", ").id
+    }}{{
+      !method_args.empty? ? ")".id : "".id
+    }}{{
+      method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id
+    }}
+    # And write the alias method.
     {{
       receiver == @type ?
         "".id :
