@@ -2,6 +2,15 @@ require "spec"
 require "../src/alias_method"
 
 class AliasTestClass
+
+  def self.bare_class_method
+    77
+  end
+
+  def [](val)
+    val * val * val
+  end
+
   def bare
     7
   end
@@ -46,6 +55,7 @@ class AliasTestClass
     "There can be only one."
   end
 
+  alias_method("new_get", "[]")
   alias_method("new_bare", "bare")
   alias_method("new_bare_with_return_type", "bare_with_return_type")
   alias_method("new_with_args", "with_args")
@@ -59,4 +69,6 @@ class AliasTestClass
 
   alias_method("new_bare_and_remove", "bare_and_remove")
   remove_method("bare_and_remove")
+
+  alias_method("new_bare_class_method", "AliasTestClass.bare_class_method")
 end

@@ -147,7 +147,27 @@ macro alias_method(to, from, yield_arity = 0)
     # method into a new name is to allow both references to refer to the same
     # same implementation. This also allows one to later remove either the
     # original or the alias without affecting the other.
-    new_name ||= "#{method.name.id}_#{method.column_number}X#{method.line_number}"
+    unless new_name
+      new_name = "#{method.name.id}_#{method.column_number}X#{method.line_number}"
+      {
+        "lxesxs":        /\s*\<\s*/,
+        "exqualxs":      /\s*\=\s*/,
+        "exxclamatioxn": /\s*\!\s*/,
+        "txildxe":       /\s*\~\s*/,
+        "gxreatexr":     /\s*\>\s*/,
+        "pxluxs":        /\s*\+\s*/,
+        "mxinuxs":       /\s*\-\s*/,
+        "axsterisxk":    /\s*\*\s*/,
+        "sxlasxh":       /\s*\/\s*/,
+        "pxercenxt":     /\s*\%\s*/,
+        "axmpersanxd":   /\s*\&\s*/,
+        "qxuestioxn":    /\s*\?\s*/,
+        "lxbrackext":    /\s*\[\s*/,
+        "rxbrackext":    /\s*\]\s*/,
+      }.each do |label, punctuation|
+        new_name = new_name.gsub(punctuation, label.stringify)
+      end
+    end
   %}
   # Original method recreation, under a new name.
   {{
@@ -278,7 +298,6 @@ macro remove_method(from)
    method_name = from
  end %}
 
-  {% new_name = nil %}
   {% methods = receiver ? receiver.methods.select { |m| m.name.id == method_name } : [] of Nil %}
   {% for method in methods %}
   {%

@@ -82,4 +82,9 @@ describe AliasMethod do
       test.bare_and_remove
     end
   end
+
+  it "can alias class methods" do
+    AliasTestClass.bare_class_method.should eq 77
+    AliasTestClass.new_bare_class_method.should eq 77
+  end
 end

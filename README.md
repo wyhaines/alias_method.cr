@@ -4,7 +4,9 @@
 
 # alias_method
 
-TODO: Write a description here
+Crystal does not natively support the creation of method aliases. This is by design, and the general philosophy of the language is that any given method should only be called by a single name.
+
+However, there are times when one might want to create method aliases. It is certainly possible to hand-write code to do this, but this shard provides a single-line way of aliasing a method. It works for both instance methods and for class methods.
 
 ## Installation
 
