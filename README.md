@@ -41,7 +41,7 @@ class MyClass
   end
 
   # Spanish translations of the method names:
-  alias_method "suma", "self.add"
+  alias_method "suma", "self.add", 1
   alias_method "con", "with"
 end
 

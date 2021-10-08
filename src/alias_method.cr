@@ -20,6 +20,7 @@ end
 # must provide that arity information to the macro if the arity is anything
 # other than zero.
 #
+# ```crystal
 # class MyClass
 #   def self.add(x, y)
 #     x + y
