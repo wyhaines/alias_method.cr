@@ -1,3 +1,7 @@
+![Alias_Method.cr CI](https://img.shields.io/github/workflow/status/wyhaines/alias_method.cr/Alias_Method.cr%20CI?style=for-the-badge&logo=GitHub)
+[![GitHub release](https://img.shields.io/github/release/wyhaines/alias_method.cr.svg?style=for-the-badge)](https://github.com/wyhaines/alias_method.cr/releases)
+![GitHub commits since latest release (by SemVer)](https://img.shields.io/github/commits-since/wyhaines/alias_method.cr/latest?style=for-the-badge)
+
 # alias_method
 
 TODO: Write a description here
@@ -37,3 +41,6 @@ TODO: Write development instructions here
 ## Contributors
 
 - [Kirk Haines](https://github.com/your-github-user) - creator and maintainer
+
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/wyhaines/alias_method.cr?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/wyhaines/alias_method.cr?style=for-the-badge)
