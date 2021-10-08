@@ -175,12 +175,20 @@
         <div class="doc">
           
           <p>This macro aliases a given method name to a new name.</p>
+
+<p>When a method contains a <code>yield</code> statement, that method accepts a block.
+However, because the block is not captured, the macro does not know what
+the expected call signature of the block is. So, when it constructs the
+block forwarding code, it has no way of knowing how many arguments the
+code expects the block to have. So, when aliasing methods that yield, one
+must provide that arity information to the macro if the arity is anything
+other than zero.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/f68fc59f8d20b2a65af982f3b00c41879a284828/src/alias_method.cr#L9" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/ccd9ad638608495ebe32df538daebf582478e6aa/src/alias_method.cr#L17" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -196,14 +204,14 @@
         <div class="doc">
           
           <p>This macro removes a method. It is not possible to actually undefined
-a method in Crystal, so what this macro does is to redefine the method
-to return, at runtime, a method undefined exception.</p>
+a method in Crystal, so this macro redefines the method to return, at
+runtime, a NoMethodError exception.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/f68fc59f8d20b2a65af982f3b00c41879a284828/src/alias_method.cr#L261" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/ccd9ad638608495ebe32df538daebf582478e6aa/src/alias_method.cr#L269" target="_blank">View source</a>]
         
       </div>
     </div>

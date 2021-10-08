@@ -77,11 +77,11 @@
 <a href="https://github.com/wyhaines/alias_method.cr/releases"><img src="https://img.shields.io/github/release/wyhaines/alias_method.cr.svg?style=for-the-badge" alt="GitHub release"/></a>
 <img src="https://img.shields.io/github/commits-since/wyhaines/alias_method.cr/latest?style=for-the-badge" alt="GitHub commits since latest release (by SemVer)"/></p>
 
-<h1><a id="alias-method" class="anchor" href="#alias-method">
+<h1><a id="alias-method.cr" class="anchor" href="#alias-method.cr">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>alias_method</h1>
+</a>Alias_Method.cr</h1>
 
 <p>Crystal does not natively support the creation of method aliases. This is by design, and the general philosophy of the language is that any given method should only be called by a single name.</p>
 
@@ -99,7 +99,7 @@
    dependencies:</p>
 
 <pre><code class="language-crystal"> alias_method:
-   github: your-github-user/alias_method</code></pre>
+   github: wyhaines/alias_method.cr</code></pre>
 
 <p><code></code>`</p>
 
@@ -113,7 +113,54 @@
 
 <pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;alias_method&quot;</span></code></pre>
 
-<p><span class="flag orange">TODO</span>  Write usage instructions here</p>
+<p>The <code><a href="toplevel.html#alias_method(to,from,yield_arity=0)-macro">alias_method(to, from, yield_arity)</a></code> macro is used to create method aliases. For most usage, only the <code>to</code> and the <code>from</code> arguments are required. The <code>yield_arity</code> argument is optional, only applies when aliasing a method that yields, and defaults to <code>0</code>.</p>
+
+<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
+  <span class="k">def</span> <span class="m">self</span>.add(x, y)
+    x <span class="o">+</span> y
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="m">with</span>(arg)
+    <span class="k">yield</span> arg
+  <span class="k">end</span>
+
+  <span class="c"># Spanish translations of the method names:</span>
+  alias_method <span class="s">&quot;suma&quot;</span>, <span class="s">&quot;self.add&quot;</span>
+  alias_method <span class="s">&quot;con&quot;</span>, <span class="s">&quot;with&quot;</span>
+<span class="k">end</span>
+
+foo <span class="o">=</span> <span class="t">Foo</span>.<span class="k">new</span>
+
+puts <span class="t">Foo</span>.suma(<span class="n">123</span>, <span class="n">456</span>)
+puts(foo.con(<span class="n">7</span>) <span class="k">do</span> <span class="o">|</span>x<span class="o">|</span>
+  x <span class="o">**</span> x
+<span class="k">end</span>)</code></pre>
+
+<p>The macro will not throw any errors if the method being aliased can not be found.</p>
+
+<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
+  alias_method <span class="s">&quot;nada&quot;</span>, <span class="s">&quot;nothing&quot;</span>
+<span class="k">end</span></code></pre>
+
+<p>The shard also implements a <code><a href="toplevel.html#remove_method(from)-macro">remove_method</a></code> macro that can be used to (sort of) remove methods. Crystal does not actually provide any ability to truly undefine a method, so this macro redefines the removed method to throw a <code><a href="NoMethodError.html">NoMethodError</a></code> exception.</p>
+
+<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
+  <span class="k">def</span> <span class="m">self</span>.add(x, y)
+    x <span class="o">+</span> y
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="m">with</span>(arg)
+    <span class="k">yield</span> arg
+  <span class="k">end</span>
+
+  <span class="c"># Spanish translations of the method names:</span>
+  alias_method <span class="s">&quot;suma&quot;</span>, <span class="s">&quot;self.add&quot;</span>
+  alias_method <span class="s">&quot;con&quot;</span>, <span class="s">&quot;with&quot;</span>
+
+  <span class="c"># Remove the English versions.</span>
+  remove_method <span class="s">&quot;with&quot;</span>
+  remove_method <span class="s">&quot;self.add&quot;</span>
+<span class="k">end</span></code></pre>
 
 <h2><a id="development" class="anchor" href="#development">
   <svg class="octicon-link" aria-hidden="true">
@@ -121,7 +168,7 @@
   </svg>
 </a>Development</h2>
 
-<p><span class="flag orange">TODO</span>  Write development instructions here</p>
+<p>If you wish to contribute to this shard, please fork the repository, and work from a branch within your own fork. When your work is complete (and has appropriate specs), submit a PR. Thank you!</p>
 
 <h2><a id="contributing" class="anchor" href="#contributing">
   <svg class="octicon-link" aria-hidden="true">
@@ -129,7 +176,7 @@
   </svg>
 </a>Contributing</h2>
 
-<ol><li>Fork it (&lt;https://github.com/your-github-user/alias_method/fork>)</li><li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li><li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li><li>Push to the branch (<code>git push origin my-new-feature</code>)</li><li>Create a new Pull Request</li></ol>
+<ol><li>Fork it (&lt;https://github.com/wyhaines/alias_method/fork>)</li><li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li><li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li><li>Push to the branch (<code>git push origin my-new-feature</code>)</li><li>Create a new Pull Request</li></ol>
 
 <h2><a id="contributors" class="anchor" href="#contributors">
   <svg class="octicon-link" aria-hidden="true">
@@ -137,7 +184,7 @@
   </svg>
 </a>Contributors</h2>
 
-<ul><li><a href="https://github.com/your-github-user">Kirk Haines</a> - creator and maintainer</li></ul>
+<ul><li><a href="https://github.com/wyhaines">Kirk Haines</a> - creator and maintainer</li></ul>
 
 <p><img src="https://img.shields.io/github/languages/code-size/wyhaines/alias_method.cr?style=for-the-badge" alt="GitHub code size in bytes"/>
 <img src="https://img.shields.io/github/issues/wyhaines/alias_method.cr?style=for-the-badge" alt="GitHub issues"/></p>
