@@ -2,7 +2,6 @@ require "spec"
 require "../src/alias_method"
 
 class AliasTestClass
-
   def self.bare_class_method
     77
   end

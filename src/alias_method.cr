@@ -6,6 +6,14 @@ class NoMethodError < Exception
 end
 
 # This macro aliases a given method name to a new name.
+#
+# When a method contains a `yield` statement, that method accepts a block.
+# However, because the block is not captured, the macro does not know what
+# the expected call signature of the block is. So, when it constructs the
+# block forwarding code, it has no way of knowing how many arguments the
+# code expects the block to have. So, when aliasing methods that yield, one
+# must provide that arity information to the macro if the arity is anything
+# other than zero.
 macro alias_method(to, from, yield_arity = 0)
   {% method_name = nil %}
   {% # Figure out where the method lives....
@@ -256,8 +264,8 @@ macro alias_method(to, from, yield_arity = 0)
 end
 
 # This macro removes a method. It is not possible to actually undefined
-# a method in Crystal, so what this macro does is to redefine the method
-# to return, at runtime, a method undefined exception.
+# a method in Crystal, so this macro redefines the method to return, at
+# runtime, a NoMethodError exception.
 macro remove_method(from)
   {% method_name = nil %}
   {% # Figure out where the method lives....
@@ -314,44 +322,6 @@ macro remove_method(from)
     if block_arg
       method_args << block_arg
       method_arg_names << block_arg_name
-    end
-
-    block_arg_arity = nil
-    block_arg_ary = [] of String
-    block_arg_list = ""
-    block_call_list = ""
-    block_type = nil
-    if method.accepts_block?
-      block_type = method.block_arg ? "block" : "yield"
-
-      # If you are reading this code, the block below is because we need
-      # construct a list of variable names, for any block arity that the
-      # code might encounter, but the macro language doesn't give us many
-      # tools to do this. So, we have to do it gross. If you can think of
-      # a better way to do this, please let me know.
-      left = method.block_arg.id.gsub(/[\w\d_]+\s+:\s+.\s*/, "").split("->")[0].id
-      block_arg_arity = block_type == "block" ? (left.split(",").reject(&.empty?).size - 1) : (yield_arity - 1)
-
-      if block_arg_arity > -1
-        letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-        (0..block_arg_arity).each do |n|
-          block_arg = ""
-          work = n
-          block_arg = letters[work % 26]
-          work = (work // 26) - 1
-          (0..3).each do
-            if work >= 0
-              block_arg = letters[work % 26] + block_arg
-              work = (work // 26) - 1
-            end
-          end
-
-          block_arg_ary << block_arg
-        end
-
-        block_call_list = block_arg_ary.join(", ").id
-        block_arg_list = "|#{block_call_list}|"
-      end
     end
   %}
 
