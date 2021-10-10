@@ -87,4 +87,6 @@ describe AliasMethod do
     AliasTestClass.bare_class_method.should eq 77
     AliasTestClass.new_bare_class_method.should eq 77
   end
+
+  
 end

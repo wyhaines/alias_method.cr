@@ -83,6 +83,36 @@ class MyClass
 end
 ```
 
+## Benchmarks
+
+Aliasing methods has no impact on performance, when compiling in release mode (in development mode, they are approximately 1/2 as fast as unaliased methods).
+
+```
+--------------------------------          
+   bare, aliased, alias 968.52M (  1.03ns) (± 2.71%)  0.0B/op        fastest
+bare, aliased, original 965.20M (  1.04ns) (± 2.67%)  0.0B/op   1.00× slower
+        bare, unaliased 965.87M (  1.04ns) (± 2.65%)  0.0B/op   1.00× slower
+--------------------------------
+   with arguments, aliased, alias 970.17M (  1.03ns) (± 2.43%)  0.0B/op        fastest
+with arguments, aliased, original 962.70M (  1.04ns) (± 2.55%)  0.0B/op   1.01× slower
+        with arguments, unaliased 964.02M (  1.04ns) (± 2.44%)  0.0B/op   1.01× slower
+--------------------------------
+   with block, aliased, alias 966.57M (  1.03ns) (± 2.33%)  0.0B/op        fastest
+with block, aliased, original 961.09M (  1.04ns) (± 4.18%)  0.0B/op   1.01× slower
+        with block, unaliased 966.30M (  1.03ns) (± 2.40%)  0.0B/op   1.00× slower
+--------------------------------
+   with yield, aliased, alias 968.25M (  1.03ns) (± 2.17%)  0.0B/op        fastest
+with yield, aliased, original 966.45M (  1.03ns) (± 2.49%)  0.0B/op   1.00× slower
+        with yield, unaliased 966.61M (  1.03ns) (± 2.49%)  0.0B/op   1.00× slower
+--------------------------------
+   class method, aliased, alias 968.68M (  1.03ns) (± 2.83%)  0.0B/op        fastest
+class method, aliased, original 966.72M (  1.03ns) (± 2.63%)  0.0B/op   1.00× slower
+        class method, unaliased 967.43M (  1.03ns) (± 2.27%)  0.0B/op   1.00× slower
+--------------------------------
+```
+
+One interesting thing to note is that there seems to be a very slight bias in benchmark outcomes, based on the order of the code being benchmarked. In general, the first block tends to benchmark very slightly faster than the last, which means that if the order of each of the items in the benchmark is reversed, so that unaliased is first, and the aliased method is last, the above results would likely lean towards unaliased first. However, the effect is very slight. There is no appreciable difference in performance, in release mode code, between an aliased method and an unaliased method.
+
 ## Development
 
 If you wish to contribute to this shard, please fork the repository, and work from a branch within your own fork. When your work is complete (and has appropriate specs), submit a PR. Thank you!
