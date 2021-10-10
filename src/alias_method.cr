@@ -20,36 +20,36 @@ end
 # must provide that arity information to the macro if the arity is anything
 # other than zero.
 #
-# ```crystal
-#   class MyClass
-#     def self.add(x, y)
-#       x + y
-#     end
-#
-#     def with(arg)
-#       yield arg
-#     end
-#
-#     # Spanish translations of the method names:
-#     alias_method "suma", "self.add", 1
-#     alias_method "con", "with"
+# ```
+# class MyClass
+#   def self.add(x, y)
+#     x + y
 #   end
 #
-#   foo = Foo.new
+#   def with(arg)
+#     yield arg
+#   end
 #
-#   puts Foo.suma(123, 456)
-#   puts(foo.con(7) do |x|
-#     x ** x
-#   end)
+#   # Spanish translations of the method names:
+#   alias_method "suma", "self.add", 1
+#   alias_method "con", "with"
+# end
+#
+# foo = Foo.new
+#
+# puts Foo.suma(123, 456)
+# puts(foo.con(7) do |x|
+#   x ** x
+# end)
 # ```
 #
 # The macro will not throw any errors if the method being aliased can not be
 # found.
 #
-# ```crystal
-#   class MyClass
-#     alias_method "nada", "nothing"
-#   end
+# ```
+# class MyClass
+#   alias_method "nada", "nothing"
+# end
 # ```
 macro alias_method(to, from, yield_arity = 0)
   {% method_name = nil %}
