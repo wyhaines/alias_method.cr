@@ -55,7 +55,10 @@ macro alias_method(to, from, yield_arity = 0)
   {% method_name = nil %}
   {% # Figure out where the method lives....
 
- if from.includes?(".")
+ if from.class_name == "Call"
+   receiver = from.receiver || @type
+   method_name = from.id
+ elsif from.includes?(".")
    receiver_name, method_name = from.split(".")
 
    if receiver_name == "self"
@@ -94,7 +97,10 @@ macro alias_method(to, from, yield_arity = 0)
 
   {% # Figure out where the method lives....
 
- if to.includes?(".")
+ if to.class_name == "Call"
+   to_receiver = to.receiver || @type
+   to_method_name = to.id
+ elsif to.includes?(".")
    to_receiver_name, to_method_name = from.split(".")
 
    if to_receiver_name == "self"
@@ -131,6 +137,7 @@ macro alias_method(to, from, yield_arity = 0)
    to_method_name = to
  end %}
 
+  {% puts receiver %}
   {% new_name = nil %}
   {% methods = receiver ? receiver.methods.select { |m| m.name.id == method_name } : [] of Nil %}
   {% for method in methods %}

@@ -55,7 +55,7 @@ class AliasTestClass
   end
 
   alias_method("new_get", "[]")
-  alias_method("new_bare", "bare")
+  alias_method(new_bare, bare)
   alias_method("new_bare_with_return_type", "bare_with_return_type")
   alias_method("new_with_args", "with_args")
   alias_method("new_with_args_and_return_type", "with_args_and_return_type")
