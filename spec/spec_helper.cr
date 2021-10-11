@@ -1,5 +1,10 @@
 require "spec"
 require "../src/alias_method"
+class CrossClassAliasTest
+  def self.bare_crossclass
+    "abc"
+  end
+end
 
 class AliasTestClass
   def self.bare_class_method
@@ -69,5 +74,7 @@ class AliasTestClass
   alias_method("new_bare_and_remove", "bare_and_remove")
   remove_method("bare_and_remove")
 
-  alias_method("new_bare_class_method", "AliasTestClass.bare_class_method")
+  alias_method("AliasTestClass.new_bare_class_method", "AliasTestClass.bare_class_method")
+
+  alias_method(new_bare_crossclass, "CrossClassAliasTest.bare_crossclass")
 end
