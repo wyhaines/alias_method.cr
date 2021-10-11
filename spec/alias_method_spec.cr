@@ -23,6 +23,13 @@ describe AliasMethod do
     test.new_with_args(1, 3).should eq [1, 3]
   end
 
+  it "can call the aliased method, using keyword arguments" do
+    test = AliasTestClass.new
+
+    test.with_args(one: 1, two: 3).should eq [1, 3]
+    test.new_with_args(one: 1, two: 3).should eq [1, 3]
+  end
+
   it "can alias a method that takes simple arguments and has a typed return value" do
     test = AliasTestClass.new
 
@@ -58,6 +65,13 @@ describe AliasMethod do
 
     test.with_arg_and_capture(7) { |x| x*x }.should eq 49
     test.new_with_arg_and_capture(8) { |x| x*x }.should eq 64
+  end
+
+  it "can call an aliased method using keyword arguments, when that method captures a block" do
+    test = AliasTestClass.new
+
+    test.with_arg_and_capture(arg: 7) { |x| x*x }.should eq 49
+    test.new_with_arg_and_capture(arg: 8) { |x| x*x }.should eq 64
   end
 
   it "can alias a method that captures a block and has a typed return value" do
