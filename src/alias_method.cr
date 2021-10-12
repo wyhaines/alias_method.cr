@@ -335,45 +335,87 @@ end
 # runtime, a NoMethodError exception.
 #
 # Method removal works on both class methods and instance methods.
+# If you have a method chain that has been created through multiple layers
+# of methods, and one of the links in the middle of the chain is removed,
+# it will break the chain, so be careful with that.
+#
+# Methods to be removed can be specified directly, through StringLiterals,
+# or through Symbol literals, just like alias_method.
+#
+# ```crystal
+# class Foo
+#   def original_method
+#     "do method stuff"
+#   end
+#
+#   alias_method dup_original_method, original_method
+#   alias_method copy_original_method, original_method
+#   alias_method extra_original_method, original_method
+#
+#   # Use a naked method name:
+#   remove_method original_method
+#
+#   # Use a string:
+#   remove_method "extra_original_method"
+# 
+#   # Use a symbol:
+#   remove_method :copy_original_method
+# ```
+#
+# This can be convenient when aliasing class methods.
+#
+# ```crystal
+# module Benchmark
+#   alias_method "self.instructions_per_second", "self.ips"
+# end
+# ```
 macro remove_method(from)
-  {% method_name = nil %}
-  {% # Figure out where the method lives....
- if from.includes?(".")
-   receiver_name, method_name = from.split(".")
+  {%
+    method_name = nil
+    if from.class_name == "Call"
+      if from.receiver.is_a?(Nop)
+        receiver = @type
+      else
+        receiver = from.receiver.resolve.class
+      end
+      method_name = from.name
+    elsif from.includes?(".")
+      receiver_name, method_name = from.split(".")
 
-   if receiver_name == "self"
-     receiver = @type.class
-   else
-     receiver = nil
-     search_paths = [@top_level]
-     search_paths << @type.class unless receiver_name[0..1] == "::"
+      if receiver_name == "self"
+        receiver = @type.class
+      else
+        receiver = nil
+        search_paths = [@top_level]
+        search_paths << @type.class unless receiver_name[0..1] == "::"
 
-     search_paths.each do |search_path|
-       unless receiver
-         found_the_receiver = true
-         parts = receiver_name.split("::")
-         parts.each do |part|
-           if found_the_receiver
-             constant_id = search_path.constants.find { |c| c.id == part }
-             if !constant_id
-               found_the_receiver = false
-             else
-               search_path = search_path.constant(constant_id)
-               found_the_receiver = false if search_path.nil?
-             end
-           end
-         end
+        search_paths.each do |search_path|
+          unless receiver
+            found_the_receiver = true
+            parts = receiver_name.split("::")
+            parts.each do |part|
+              if found_the_receiver
+                constant_id = search_path.constants.find { |c| c.id == part }
+                if !constant_id
+                  found_the_receiver = false
+                else
+                  search_path = search_path.constant(constant_id)
+                  found_the_receiver = false if search_path.nil?
+                end
+              end
+            end
 
-         if found_the_receiver
-           receiver = search_path.class
-         end
-       end
-     end
-   end
- else
-   receiver = @type
-   method_name = from
- end %}
+            if found_the_receiver
+              receiver = search_path.class
+            end
+          end
+        end
+      end
+    else
+      receiver = @type
+      method_name = from
+    end
+  %}
 
   {% methods = receiver ? receiver.methods.select { |m| m.name.id == method_name } : [] of Nil %}
   {% for method in methods %}

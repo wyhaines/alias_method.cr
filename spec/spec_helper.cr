@@ -94,7 +94,9 @@ class AliasTestClass
   alias_method("new_with_yield", "with_yield", 1)
 
   alias_method("new_bare_and_remove", "bare_and_remove")
-  remove_method("bare_and_remove")
+  alias_method(just_remove_me, bare_and_remove)
+  remove_method :bare_and_remove
+  remove_method just_remove_me
 
   alias_method(AliasTestClass.new_bare_class_method, AliasTestClass.bare_class_method)
   alias_method("self.new_other_bare_class_method", "self.other_bare_class_method")
