@@ -247,7 +247,7 @@ macro alias_method(to, from, yield_arity = 0, redefine = false)
       end
     end
   %}
-  
+
   {%
     alias_method_call = [
       receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id ,
@@ -263,7 +263,7 @@ macro alias_method(to, from, yield_arity = 0, redefine = false)
       new_name.id
     ].join("")
   %}
-  
+
   {% if redefine || !skip_origin %}
   # Original method recreation, under a new name.
   {{

@@ -104,7 +104,7 @@ class AliasTestClass
   alias_method(new_explicitly_private, explicitly_private)
 
   alias_method chain_a, chain, redefine: true
-  
+
   def chain(ary)
     chain_a(ary) << "b"
   end
