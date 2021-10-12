@@ -64,6 +64,22 @@ class AliasTestClass
     "There can be only one."
   end
 
+  private def explicitly_private
+    "private"
+  end
+
+  def call_explicitly_private
+    explicitly_private
+  end
+
+  def call_new_explicitly_private
+    new_explicitly_private
+  end
+
+  def chain(ary)
+    ary << "a"
+  end
+
   alias_method("new_get", "[]")
   alias_method also_new_get, :[]
   alias_method(new_bare, bare)
@@ -84,4 +100,18 @@ class AliasTestClass
   alias_method("self.new_other_bare_class_method", "self.other_bare_class_method")
 
   alias_method(new_bare_crossclass, CrossClassAliasTest.bare_crossclass)
+
+  alias_method(new_explicitly_private, explicitly_private)
+
+  alias_method chain_a, chain, redefine: true
+  
+  def chain(ary)
+    chain_a(ary) << "b"
+  end
+  alias_method chain_b, chain, redefine: true
+  def chain(ary)
+    chain_b(ary) << "c"
+  end
+  alias_method chain_c, chain, redefine: true
+
 end

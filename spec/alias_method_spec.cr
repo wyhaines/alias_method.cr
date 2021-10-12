@@ -1,6 +1,14 @@
 require "./spec_helper"
 
 describe AliasMethod do
+  it "can alias a method named with punctuation (like [])" do
+    test = AliasTestClass.new
+
+    test[3].should eq 27
+    test.new_get(4).should eq 64
+    test.also_new_get(5).should eq 125
+  end
+
   it "can alias a method that takes no arguments" do
     test = AliasTestClass.new
 
@@ -100,5 +108,18 @@ describe AliasMethod do
   it "can alias class methods" do
     AliasTestClass.bare_class_method.should eq 77
     AliasTestClass.new_bare_class_method.should eq 77
+  end
+
+  it "can alias private methods" do
+    test = AliasTestClass.new
+
+    test.call_explicitly_private.should eq "private"
+    test.call_new_explicitly_private.should eq "private"
+  end
+
+  it "can chain method calls with aliases" do
+    test = AliasTestClass.new
+
+    test.chain_c([] of String).should eq ["a", "b", "c"]
   end
 end

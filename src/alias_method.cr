@@ -53,7 +53,7 @@ end
 #   alias_method "nada", "nothing"
 # end
 # ```
-macro alias_method(to, from, yield_arity = 0)
+macro alias_method(to, from, yield_arity = 0, redefine = false)
   {%
     # Figure out where the _from_ method lives....
 
@@ -160,8 +160,12 @@ macro alias_method(to, from, yield_arity = 0)
   {%
     skip_origin = false
     # If the original method already has a new name, don't create it again.
+    pp method.annotations(AliasMethod::Alias)
     if ann = method.annotation(AliasMethod::Alias)
-      skip_origin = true if ann[:parent]
+      if ann[:parent]
+        skip_origin = true
+        new_name = ann[:parent]
+      end
     end
 
     method_args = method.args
@@ -243,8 +247,24 @@ macro alias_method(to, from, yield_arity = 0)
       end
     end
   %}
+  
+  {%
+    alias_method_call = [
+      receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id ,
+      new_name.id,
+      !method_args.empty? ? "(".id : "".id,
+      method_arg_names.join(", ").id,
+      !method_args.empty? ? ")".id : "".id,
+      method.accepts_block? && (block_type == "yield") ? "{#{block_arg_list.id} yield(#{block_call_list.id})}".id : "".id
+    ].join("")
 
-  {% if !skip_origin %}
+    fqnn = [
+      @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id,
+      new_name.id
+    ].join("")
+  %}
+  
+  {% if redefine || !skip_origin %}
   # Original method recreation, under a new name.
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
@@ -263,10 +283,9 @@ macro alias_method(to, from, yield_arity = 0)
                    }}
   {{ method.body }}
   end
-  {% end %}
 
   # Create the aliases.
-  @[AliasMethod::Alias(parent: {{ new_name }})]
+  @[AliasMethod::Alias(parent: {{ fqnn }})]
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
@@ -283,22 +302,11 @@ macro alias_method(to, from, yield_arity = 0)
                      method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id
                    }}
     # Rewrite the original method.
-    {{
-      receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id
-    }}{{
-        new_name.id
-      }}{{
-          !method_args.empty? ? "(".id : "".id
-        }}{{
-            method_arg_names.join(", ").id
-          }}{{
-              !method_args.empty? ? ")".id : "".id
-            }}{{
-                method.accepts_block? && (block_type == "yield") ? "{#{block_arg_list.id} yield(#{block_call_list.id})}".id : "".id
-              }}
+    {{ alias_method_call.id }}
   end
+  {% end %}
 
-  @[AliasMethod::Alias(parent: new_name)]
+  @[AliasMethod::Alias(parent: {{ fqnn }})]
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
@@ -315,19 +323,7 @@ macro alias_method(to, from, yield_arity = 0)
                      method.return_type.id != "" ? " : #{method.return_type.id}".id : "".id
                    }}
     # And write the alias method.
-    {{
-      receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id
-    }}{{
-        new_name.id
-      }}{{
-          !method_args.empty? ? "(".id : "".id
-        }}{{
-            method_arg_names.join(", ").id
-          }}{{
-              !method_args.empty? ? ")".id : "".id
-            }}{{
-                method.accepts_block? && (block_type == "yield") ? "{#{block_arg_list.id} yield(#{block_call_list.id})}".id : "".id
-              }}
+    {{ alias_method_call.id }}
   end
 
   {% end %}
