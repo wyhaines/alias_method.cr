@@ -137,9 +137,9 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
-        <a href="#alias_method(to,from,yield_arity=0)-macro" class="signature"><strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>)</a>
+        <a href="#alias_method(to,from,yield_arity=0,redefine=false)-macro" class="signature"><strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)</a>
         
-          <div class="summary"><p>The <code><a href="toplevel.html#alias_method(to,from,yield_arity=0)-macro">alias_method(to, from, yield_arity)</a></code> macro is used to create method aliases.</p></div>
+          <div class="summary"><p>The <code>alias_method(to, from, yield_arity)</code> macro is used to create method aliases.</p></div>
         
       </li>
     
@@ -174,17 +174,17 @@
     Macro Detail
   </h2>
   
-    <div class="entry-detail" id="alias_method(to,from,yield_arity=0)-macro">
+    <div class="entry-detail" id="alias_method(to,from,yield_arity=0,redefine=false)-macro">
       <div class="signature">
         
-        macro <strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>)
+        macro <strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)
 
-        <a class="method-permalink" href="#alias_method(to,from,yield_arity=0)-macro">#</a>
+        <a class="method-permalink" href="#alias_method(to,from,yield_arity=0,redefine=false)-macro">#</a>
       </div>
       
         <div class="doc">
           
-          <p>The <code><a href="toplevel.html#alias_method(to,from,yield_arity=0)-macro">alias_method(to, from, yield_arity)</a></code> macro is used to create method
+          <p>The <code>alias_method(to, from, yield_arity)</code> macro is used to create method
 aliases. For most usage, only the <code>to</code> and the <code>from</code> arguments are
 required. The <code>yield_arity</code> argument is optional, only applies when
 aliasing a method that yields, and defaults to <code>0</code>.</p>
@@ -229,7 +229,7 @@ found.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/b42a57bdec6ac2af446222769dffabc4202aac59/src/alias_method.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/17cbab70d7c3e94daedf3a2131d702ef543c7c74/src/alias_method.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -254,7 +254,7 @@ runtime, a NoMethodError exception.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/b42a57bdec6ac2af446222769dffabc4202aac59/src/alias_method.cr#L342" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/17cbab70d7c3e94daedf3a2131d702ef543c7c74/src/alias_method.cr#L338" target="_blank">View source</a>]
         
       </div>
     </div>
