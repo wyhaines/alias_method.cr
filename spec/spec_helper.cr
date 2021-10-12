@@ -1,5 +1,6 @@
 require "spec"
 require "../src/alias_method"
+
 class CrossClassAliasTest
   def self.bare_crossclass
     "abc"
@@ -9,6 +10,10 @@ end
 class AliasTestClass
   def self.bare_class_method
     77
+  end
+
+  def self.other_bare_class_method
+    99
   end
 
   def [](val)
@@ -60,10 +65,11 @@ class AliasTestClass
   end
 
   alias_method("new_get", "[]")
+  alias_method also_new_get, :[]
   alias_method(new_bare, bare)
   alias_method("new_bare_with_return_type", "bare_with_return_type")
   alias_method("new_with_args", "with_args")
-  alias_method("new_with_args_and_return_type", "with_args_and_return_type")
+  alias_method(:new_with_args_and_return_type, :with_args_and_return_type)
   alias_method("new_with_typed_args", "with_typed_args")
   alias_method("new_with_typed_args_and_return_type", "with_typed_args_and_return_type")
   alias_method("new_with_capture", "with_capture")
@@ -74,7 +80,8 @@ class AliasTestClass
   alias_method("new_bare_and_remove", "bare_and_remove")
   remove_method("bare_and_remove")
 
-  alias_method("AliasTestClass.new_bare_class_method", "AliasTestClass.bare_class_method")
+  alias_method(AliasTestClass.new_bare_class_method, AliasTestClass.bare_class_method)
+  alias_method("self.new_other_bare_class_method", "self.other_bare_class_method")
 
-  alias_method(new_bare_crossclass, "CrossClassAliasTest.bare_crossclass")
+  alias_method(new_bare_crossclass, CrossClassAliasTest.bare_crossclass)
 end

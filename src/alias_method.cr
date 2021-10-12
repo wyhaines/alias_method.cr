@@ -1,5 +1,7 @@
 module AliasMethod
   VERSION = "0.1.0"
+
+  annotation Alias; end
 end
 
 # This exception will be thrown if a method that has been removed via
@@ -52,99 +54,116 @@ end
 # end
 # ```
 macro alias_method(to, from, yield_arity = 0)
-  {% method_name = nil %}
-  {% # Figure out where the method lives....
+  {%
+    # Figure out where the _from_ method lives....
 
-  if from.class_name == "Call"
-    # This is the easy way, and the way that the macro should normally be used.
-    # The method to lookup is directly referenced in a Call.
-    receiver = from.receiver || @type
-    method_name = from.id
-  elsif from.includes?(".")
-    # It's a class method.
-    receiver_name, method_name = from.split(".")
+    method_name = nil
+    if from.class_name == "Call"
+      # This is the easy way, and the way that the macro should normally be used.
+      # The method to lookup is directly referenced in a Call.
+      if from.receiver.is_a?(Nop)
+        receiver = @type
+      else
+        receiver = from.receiver.resolve.class
+      end
+      method_name = from.name
+    elsif from.includes?(".")
+      # It's a class method.
+      receiver_name, method_name = from.split(".")
 
-    if receiver_name == "self"
-      receiver = @type.class
-    else
-      receiver = nil
-      search_paths = [@top_level]
-      search_paths << @type.class unless receiver_name[0..1] == "::"
+      if receiver_name == "self"
+        receiver = @type.class
+      else
+        receiver = nil
+        search_paths = [@top_level]
+        search_paths << @type.class unless receiver_name[0..1] == "::"
 
-      search_paths.each do |search_path|
-        unless receiver
-          found_the_receiver = true
-          parts = receiver_name.split("::")
-          parts.each do |part|
+        search_paths.each do |search_path|
+          unless receiver
+            found_the_receiver = true
+            parts = receiver_name.split("::")
+            parts.each do |part|
+              if found_the_receiver
+                constant_id = search_path.constants.find { |c| c.id == part }
+                if !constant_id
+                  found_the_receiver = false
+                else
+                  search_path = search_path.constant(constant_id)
+                  found_the_receiver = false if search_path.nil?
+                end
+              end
+            end
+
             if found_the_receiver
-              constant_id = search_path.constants.find { |c| c.id == part }
-              if !constant_id
-                found_the_receiver = false
-              else
-                search_path = search_path.constant(constant_id)
-                found_the_receiver = false if search_path.nil?
-              end
+              receiver = search_path.class
             end
-          end
-
-          if found_the_receiver
-            receiver = search_path.class
           end
         end
       end
-    end
-  else
-    # It refers to an instance method within the current @type.
-    receiver = @type
-    method_name = from
-  end %}
-
-    {% # Figure out where the method lives....
-
-  if to.class_name == "Call"
-    to_receiver = to.receiver || @type
-    to_method_name = to.id
-  elsif to.includes?(".")
-    to_receiver_name, to_method_name = to.split(".")
-
-    if to_receiver_name == "self"
-      to_receiver = @type.class
     else
-      to_receiver = nil
-      search_paths = [@top_level]
-      search_paths << @type.class unless receiver_name[0..1] == "::"
+      # It refers to an instance method within the current @type.
+      receiver = @type
+      method_name = from
+    end
 
-      search_paths.each do |search_path|
-        unless to_receiver
-          found_the_to_receiver = true
-          parts = to_receiver_name.split("::")
-          parts.each do |part|
-            if found_the_to_receiver
-              constant_id = search_path.constants.find { |c| c.id == part }
-              if !constant_id
-                found_the_to_receiver = false
-              else
-                search_path = search_path.constant(constant_id)
-                found_the_to_receiver = false if search_path.nil?
+    # Figure out where the _to_  method lives....
+    to_method_name = nil
+    if to.class_name == "Call"
+      if to.receiver.is_a?(Nop)
+        to_receiver = @type
+      else
+        to_receiver = to.receiver.resolve.class
+      end
+      to_method_name = to.name
+    elsif to.includes?(".")
+      to_receiver_name, to_method_name = to.split(".")
+
+      if to_receiver_name == "self"
+        to_receiver = @type.class
+      else
+        to_receiver = nil
+        search_paths = [@top_level]
+        search_paths << @type.class unless receiver_name[0..1] == "::"
+
+        search_paths.each do |search_path|
+          unless to_receiver
+            found_the_to_receiver = true
+            parts = to_receiver_name.split("::")
+            parts.each do |part|
+              if found_the_to_receiver
+                constant_id = search_path.constants.find { |c| c.id == part }
+                if !constant_id
+                  found_the_to_receiver = false
+                else
+                  search_path = search_path.constant(constant_id)
+                  found_the_to_receiver = false if search_path.nil?
+                end
               end
             end
-          end
 
-          if found_the_to_receiver
-            to_receiver = search_path.class
+            if found_the_to_receiver
+              to_receiver = search_path.class
+            end
           end
         end
       end
+    else
+      to_receiver = @type
+      to_method_name = to
     end
-  else
-    to_receiver = @type
-    to_method_name = to
-  end %}
-
-  {% new_name = nil %}
-  {% methods = receiver ? receiver.methods.select { |m| m.name.id == method_name } : [] of Nil %}
+  %}
+  {%
+    new_name = nil
+    methods = receiver ? receiver.methods.select { |m| m.name.id == method_name } : [] of Nil
+  %}
   {% for method in methods %}
   {%
+    skip_origin = false
+    # If the original method already has a new name, don't create it again.
+    if ann = method.annotation(AliasMethod::Alias)
+      skip_origin = true if ann[:parent]
+    end
+
     method_args = method.args
     method_arg_names = method.args.map &.name.id
     if method.accepts_block? && method.block_arg
@@ -224,6 +243,8 @@ macro alias_method(to, from, yield_arity = 0)
       end
     end
   %}
+
+  {% if !skip_origin %}
   # Original method recreation, under a new name.
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
@@ -242,8 +263,10 @@ macro alias_method(to, from, yield_arity = 0)
                    }}
   {{ method.body }}
   end
+  {% end %}
 
   # Create the aliases.
+  @[AliasMethod::Alias(parent: {{ new_name }})]
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
@@ -275,6 +298,7 @@ macro alias_method(to, from, yield_arity = 0)
               }}
   end
 
+  @[AliasMethod::Alias(parent: new_name)]
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
