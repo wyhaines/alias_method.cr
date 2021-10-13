@@ -19,7 +19,7 @@ end
 # * `new`: the alias; the new name for the method. This is required.
 # * `old`: the original method name; this is the method that the alias will point to.
 # * `yield_arity`: the expected arity of the block that the method being aliased will yield to. This argument is optional, and is only required is the aliased method yields, and the block that it yields to is expected to have an arity other than `0`.
-# * `redefine`: normally, when a method is aliased for the first time, a new, canonical copy of it is created, and both the original name and the alias point to the same version of the method. If additional aliases to that same method are created, that canonical version of the method will not be redefined; all aliases will point to the same implementation. When creating alias method chains, however, the aforementioned behavior prevents the formation of a chain of method calls. Each newly created alias will point to the same method. 
+# * `redefine`: normally, when a method is aliased for the first time, a new, canonical copy of it is created, and both the original name and the alias point to the same version of the method. If additional aliases to that same method are created, that canonical version of the method will not be redefined; all aliases will point to the same implementation. When creating alias method chains, however, the aforementioned behavior prevents the formation of a chain of method calls. Each newly created alias will point to the same method.
 #
 # For example, `alias_method get, :[]` creates an alias from the `[]()` method to
 # the `get()` method.
