@@ -9,6 +9,14 @@ describe AliasMethod do
     test.also_new_get(5).should eq 125
   end
 
+  it "will alias all of the overloads of a method" do
+    test = AliasTestClass.new
+
+    test["a"].should eq "aaa"
+    test.new_get("a").should eq "aaa"
+    test.also_new_get("a").should eq "aaa"
+  end
+
   it "can alias a method that takes no arguments" do
     test = AliasTestClass.new
 

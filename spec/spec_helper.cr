@@ -16,8 +16,12 @@ class AliasTestClass
     99
   end
 
-  def [](val)
+  def [](val : Number)
     val * val * val
+  end
+
+  def [](val : String)
+    val + val + val
   end
 
   def bare
