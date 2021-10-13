@@ -121,13 +121,11 @@
   </svg>
 </a>Usage</h2>
 
-<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;alias_method&quot;</span></code></pre>
+<p>See the <a href="https://wyhaines.github.io/alias_method.cr/toplevel.html">complete documentation</a> for full information on this shard and how to use it.</p>
 
-<p>The <code>alias_method(to, from, yield_arity)</code> macro is used to create method aliases. For most usage, only the <code>to</code> and the <code>from</code> arguments are required. The <code>yield_arity</code> argument is optional, only applies when aliasing a method that yields, and defaults to <code>0</code>.</p>
+<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;alias_method&quot;</span>
 
-<p>When a method contains a <code>yield</code> statement, that method accepts a block. However, because the block is not captured, the macro does not know what the expected call signature of the block is. So, when it constructs the block forwarding code, it has no way of knowing how many arguments the code expects the block to have. So, when aliasing methods that yield, one must provide that arity information to the macro if the arity is anything other than zero.</p>
-
-<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
+<span class="k">class</span> <span class="t">MyClass</span>
   <span class="k">def</span> <span class="m">self</span>.add(x, y)
     x <span class="o">+</span> y
   <span class="k">end</span>
@@ -136,25 +134,38 @@
     <span class="k">yield</span> arg
   <span class="k">end</span>
 
-  <span class="c"># Spanish translations of the method names:</span>
-  alias_method <span class="s">&quot;suma&quot;</span>, <span class="s">&quot;self.add&quot;</span>, <span class="n">1</span>
-  alias_method <span class="s">&quot;con&quot;</span>, <span class="s">&quot;with&quot;</span>
+  <span class="k">def</span> <span class="o">[]</span>(val)
+    val <span class="o">**</span> <span class="n">3</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="m">chain</span>(ary)
+    ary <span class="o">&lt;&lt;</span> <span class="s">&quot;a&quot;</span>
+  <span class="k">end</span>
+
+  alias_method <span class="s">&quot;self.suma&quot;</span>, <span class="s">&quot;self.add&quot;</span> <span class="c"># Class method alias</span>
+  alias_method suma, <span class="t">MyClass</span>.add       <span class="c"># Instance method alias to a class method</span>
+  alias_method con, <span class="n">:with</span>, <span class="n">1</span>           <span class="c"># Alias to a method that yields</span>
+  alias_method cube, <span class="n">:[]</span>               <span class="c"># Alias to a method name that has punctuation</span>
+  alias_method nada, nothing           <span class="c"># Alias to a method that doesn&#39;t exist (no error)</span>
+
+  alias_method chain_a, chain          <span class="c"># Create a chain of aliases</span>
+  <span class="k">def</span> <span class="m">chain</span>(ary)
+    chain_a(ary) <span class="o">&lt;&lt;</span> <span class="s">&quot;b&quot;</span>
+  <span class="k">end</span>
+  alias_method chain_b, chain
+  <span class="k">def</span> <span class="m">chain</span>(ary)
+     chain_b(ary) <span class="o">&lt;&lt;</span> <span class="s">&quot;c&quot;</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 
-foo <span class="o">=</span> <span class="t">Foo</span>.<span class="k">new</span>
+foo <span class="o">=</span> <span class="t">MyClass</span>.<span class="k">new</span>
 
-puts <span class="t">Foo</span>.suma(<span class="n">123</span>, <span class="n">456</span>)
-puts(foo.con(<span class="n">7</span>) <span class="k">do</span> <span class="o">|</span>x<span class="o">|</span>
-  x <span class="o">**</span> x
-<span class="k">end</span>)</code></pre>
+puts <span class="s">&quot;Call the MyClass.add class method via the class method alias, MyClass.suma: </span><span class="i">#{</span><span class="t">MyClass</span>.suma(<span class="n">123</span>, <span class="n">456</span>)<span class="i">}</span><span class="s">&quot;</span>
+puts <span class="s">&quot;Call the MyClass.add class method via the instance method alias, MyClass#suma: </span><span class="i">#{</span>foo.suma(<span class="n">456</span>, <span class="n">789</span>)<span class="i">}</span><span class="s">&quot;</span>
+puts <span class="s">&quot;Call an alias to a method that takes a block: </span><span class="i">#{</span>foo.con(<span class="n">7</span>) {<span class="o">|</span>x<span class="o">|</span> x <span class="o">**</span> x<span class="i">}</span><span class="s">}&quot;</span>
+puts <span class="s">&quot;Call a method that forms a chain of aliased methods: </span><span class="i">#{</span>foo.chain(<span class="o">[]</span> <span class="k">of</span> <span class="t">String</span>).inspect<span class="i">}</span><span class="s">&quot;</span></code></pre>
 
-<p>The macro will not throw any errors if the method being aliased can not be found.</p>
-
-<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
-  alias_method <span class="s">&quot;nada&quot;</span>, <span class="s">&quot;nothing&quot;</span>
-<span class="k">end</span></code></pre>
-
-<p>The shard also implements a <code><a href="toplevel.html#remove_method(from)-macro">remove_method</a></code> macro that can be used to (sort of) remove methods. Crystal does not actually provide any ability to truly undefine a method, so this macro redefines the removed method to throw a <code><a href="NoMethodError.html">NoMethodError</a></code> exception.</p>
+<p>The shard also implements a <code><a href="toplevel.html#remove_method(old)-macro">remove_method</a></code> macro that can be used to (sort of) remove methods. Crystal does not actually provide any ability to truly undefine a method, so this macro redefines the removed method to throw a <code><a href="NoMethodError.html">NoMethodError</a></code> exception.</p>
 
 <pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
   <span class="k">def</span> <span class="m">self</span>.add(x, y)

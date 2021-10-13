@@ -137,14 +137,14 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
-        <a href="#alias_method(to,from,yield_arity=0,redefine=false)-macro" class="signature"><strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)</a>
+        <a href="#alias_method(new,old,yield_arity=0,redefine=false)-macro" class="signature"><strong>alias_method</strong>(new, old, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)</a>
         
-          <div class="summary"><p>The <code>alias_method(to, from, yield_arity)</code> macro is used to create method aliases.</p></div>
+          <div class="summary"><p>The <code><a href="toplevel.html#alias_method(new,old,yield_arity=0,redefine=false)-macro">alias_method</a></code> macro is used to create method aliases.</p></div>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#remove_method(from)-macro" class="signature"><strong>remove_method</strong>(from)</a>
+        <a href="#remove_method(old)-macro" class="signature"><strong>remove_method</strong>(old)</a>
         
           <div class="summary"><p>This macro removes a method.</p></div>
         
@@ -174,28 +174,28 @@
     Macro Detail
   </h2>
   
-    <div class="entry-detail" id="alias_method(to,from,yield_arity=0,redefine=false)-macro">
+    <div class="entry-detail" id="alias_method(new,old,yield_arity=0,redefine=false)-macro">
       <div class="signature">
         
-        macro <strong>alias_method</strong>(to, from, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)
+        macro <strong>alias_method</strong>(new, old, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)
 
-        <a class="method-permalink" href="#alias_method(to,from,yield_arity=0,redefine=false)-macro">#</a>
+        <a class="method-permalink" href="#alias_method(new,old,yield_arity=0,redefine=false)-macro">#</a>
       </div>
       
         <div class="doc">
           
-          <p>The <code>alias_method(to, from, yield_arity)</code> macro is used to create method
-aliases. For most usage, only the <code>to</code> and the <code>from</code> arguments are
-required. The <code>yield_arity</code> argument is optional, only applies when
-aliasing a method that yields, and defaults to <code>0</code>.</p>
+          <p>The <code><a href="toplevel.html#alias_method(new,old,yield_arity=0,redefine=false)-macro">alias_method</a></code> macro is used to create method aliases.</p>
 
-<p>When a method contains a <code>yield</code> statement, that method accepts a block.
-However, because the block is not captured, the macro does not know what
-the expected call signature of the block is. So, when it constructs the
-block forwarding code, it has no way of knowing how many arguments the
-code expects the block to have. So, when aliasing methods that yield, one
-must provide that arity information to the macro if the arity is anything
-other than zero.</p>
+<p>Macro arguments:</p>
+
+<ul><li><code>new</code>: the alias; the new name for the method. This is required.</li><li><code>old</code>: the original method name; this is the method that the alias will point to.</li><li><code>yield_arity</code>: the expected arity of the block that the method being aliased will yield to. This argument is optional, and is only required is the aliased method yields, and the block that it yields to is expected to have an arity other than <code>0</code>.</li><li><code>redefine</code>: normally, when a method is aliased for the first time, a new, canonical copy of it is created, and both the original name and the alias point to the same version of the method. If additional aliases to that same method are created, that canonical version of the method will not be redefined; all aliases will point to the same implementation. When creating alias method chains, however, the aforementioned behavior prevents the formation of a chain of method calls. Each newly created alias will point to the same method.</li></ul>
+
+<p>For example, <code>alias_method get, :[]</code> creates an alias from the <code>[]()</code> method to
+the <code>get()</code> method.</p>
+
+<p>The methods to be aliased can be specified as symbol literals, string literals, or
+via direct method references. The macro will not throw any errors if the method
+being aliased can not be found.For example, consider the following examples:</p>
 
 <pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
   <span class="k">def</span> <span class="m">self</span>.add(x, y)
@@ -206,40 +206,53 @@ other than zero.</p>
     <span class="k">yield</span> arg
   <span class="k">end</span>
 
-  <span class="c"># Spanish translations of the method names:</span>
-  alias_method <span class="s">&quot;suma&quot;</span>, <span class="s">&quot;self.add&quot;</span>, <span class="n">1</span>
-  alias_method <span class="s">&quot;con&quot;</span>, <span class="s">&quot;with&quot;</span>
+  <span class="k">def</span> <span class="o">[]</span>(val)
+    val <span class="o">**</span> <span class="n">3</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="m">chain</span>(ary)
+    ary <span class="o">&lt;&lt;</span> <span class="s">&quot;a&quot;</span>
+  <span class="k">end</span>
+
+  alias_method <span class="s">&quot;self.suma&quot;</span>, <span class="s">&quot;self.add&quot;</span> <span class="c"># Class method alias</span>
+  alias_method suma, <span class="t">MyClass</span>.add       <span class="c"># Instance method alias to a class method</span>
+  alias_method con, <span class="n">:with</span>, <span class="n">1</span>           <span class="c"># Alias to a method that yields</span>
+  alias_method cube, <span class="n">:[]</span>               <span class="c"># Alias to a method name that has punctuation</span>
+  alias_method nada, nothing           <span class="c"># Alias to a method that doesn&#39;t exist (no error)</span>
+
+  alias_method chain_a, chain          <span class="c"># Create a chain of aliases</span>
+  <span class="k">def</span> <span class="m">chain</span>(ary)
+    chain_a(ary) <span class="o">&lt;&lt;</span> <span class="s">&quot;b&quot;</span>
+  <span class="k">end</span>
+  alias_method chain_b, chain
+  <span class="k">def</span> <span class="m">chain</span>(ary)
+     chain_b(ary) <span class="o">&lt;&lt;</span> <span class="s">&quot;c&quot;</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 
-foo <span class="o">=</span> <span class="t">Foo</span>.<span class="k">new</span>
+foo <span class="o">=</span> <span class="t">MyClass</span>.<span class="k">new</span>
 
-puts <span class="t">Foo</span>.suma(<span class="n">123</span>, <span class="n">456</span>)
-puts(foo.con(<span class="n">7</span>) <span class="k">do</span> <span class="o">|</span>x<span class="o">|</span>
-  x <span class="o">**</span> x
-<span class="k">end</span>)</code></pre>
-
-<p>The macro will not throw any errors if the method being aliased can not be
-found.</p>
-
-<pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
-  alias_method <span class="s">&quot;nada&quot;</span>, <span class="s">&quot;nothing&quot;</span>
-<span class="k">end</span></code></pre>
+puts <span class="s">&quot;Call the MyClass.add class method via the class method alias, MyClass.suma: </span><span class="i">#{</span><span class="t">MyClass</span>.suma(<span class="n">123</span>, <span class="n">456</span>)<span class="i">}</span><span class="s">&quot;</span>
+puts <span class="s">&quot;Call the MyClass.add class method via the instance method alias, MyClass#suma: </span><span class="i">#{</span>foo.suma(<span class="n">456</span>, <span class="n">789</span>)<span class="i">}</span><span class="s">&quot;</span>
+puts <span class="s">&quot;Call an alias to a method that takes a block: </span><span class="i">#{</span>foo.con(<span class="n">7</span>) {<span class="o">|</span>x<span class="o">|</span> x <span class="o">**</span> x<span class="i">}</span><span class="s">}&quot;</span>
+puts <span class="s">&quot;Call a method that forms a chain of aliased methods: </span><span class="i">#{</span>foo.chain(<span class="o">[]</span> <span class="k">of</span> <span class="t">String</span>).inspect<span class="i">}</span><span class="s">&quot;</span>
+</code></pre>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/badbcbf54de4508459ba0ea24086b4a2d2528796/src/alias_method.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/330c6f34541e1b9fc2db700abf1dde58ff6f3877/src/alias_method.cr#L74" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="remove_method(from)-macro">
+    <div class="entry-detail" id="remove_method(old)-macro">
       <div class="signature">
         
-        macro <strong>remove_method</strong>(from)
+        macro <strong>remove_method</strong>(old)
 
-        <a class="method-permalink" href="#remove_method(from)-macro">#</a>
+        <a class="method-permalink" href="#remove_method(old)-macro">#</a>
       </div>
       
         <div class="doc">
@@ -284,7 +297,7 @@ or through Symbol literals, just like alias_method.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/badbcbf54de4508459ba0ea24086b4a2d2528796/src/alias_method.cr#L372" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/330c6f34541e1b9fc2db700abf1dde58ff6f3877/src/alias_method.cr#L389" target="_blank">View source</a>]
         
       </div>
     </div>
