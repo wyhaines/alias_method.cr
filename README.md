@@ -2,7 +2,7 @@
 [![GitHub release](https://img.shields.io/github/release/wyhaines/alias_method.cr.svg?style=for-the-badge)](https://github.com/wyhaines/alias_method.cr/releases)
 ![GitHub commits since latest release (by SemVer)](https://img.shields.io/github/commits-since/wyhaines/alias_method.cr/latest?style=for-the-badge)
 
-# Alias_Method.cr
+# [Alias_Method.cr](https://wyhaines.github.io/alias_method.cr/)
 
 Crystal does not natively support the creation of method aliases. This is by design, and the general philosophy of the language is that any given method should only be called by a single name.
 
