@@ -357,7 +357,7 @@ end
 #
 #   # Use a string:
 #   remove_method "extra_original_method"
-# 
+#
 #   # Use a symbol:
 #   remove_method :copy_original_method
 # ```
