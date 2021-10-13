@@ -1,5 +1,5 @@
 module AliasMethod
-  VERSION = "0.1.0"
+  VERSION = "0.2.0"
 
   # When an alias is created, the macro will assign an annotation to it that
   # does the double duty of clearly marking that a method is an alias, and also
