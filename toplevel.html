@@ -229,7 +229,7 @@ found.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/17cbab70d7c3e94daedf3a2131d702ef543c7c74/src/alias_method.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/b14ce7ca419b643559a79ec2cea3c26712675f15/src/alias_method.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -248,13 +248,43 @@ found.</p>
 a method in Crystal, so this macro redefines the method to return, at
 runtime, a NoMethodError exception.</p>
 
-<p>Method removal works on both class methods and instance methods.</p>
+<p>Method removal works on both class methods and instance methods.
+If you have a method chain that has been created through multiple layers
+of methods, and one of the links in the middle of the chain is removed,
+it will break the chain, so be careful with that.</p>
+
+<p>Methods to be removed can be specified directly, through StringLiterals,
+or through Symbol literals, just like alias_method.</p>
+
+<pre><code class="language-crystal"><span class="k">class</span> <span class="t">Foo</span>
+  <span class="k">def</span> <span class="m">original_method</span>
+    <span class="s">&quot;do method stuff&quot;</span>
+  <span class="k">end</span>
+
+  alias_method dup_original_method, original_method
+  alias_method copy_original_method, original_method
+  alias_method extra_original_method, original_method
+
+  <span class="c"># Use a naked method name:</span>
+  remove_method original_method
+
+  <span class="c"># Use a string:</span>
+  remove_method <span class="s">&quot;extra_original_method&quot;</span>
+
+  <span class="c"># Use a symbol:</span>
+  remove_method <span class="n">:copy_original_method</span></code></pre>
+
+<p>This can be convenient when aliasing class methods.</p>
+
+<pre><code class="language-crystal"><span class="k">module</span> <span class="t">Benchmark</span>
+  alias_method <span class="s">&quot;self.instructions_per_second&quot;</span>, <span class="s">&quot;self.ips&quot;</span>
+<span class="k">end</span></code></pre>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/17cbab70d7c3e94daedf3a2131d702ef543c7c74/src/alias_method.cr#L338" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/b14ce7ca419b643559a79ec2cea3c26712675f15/src/alias_method.cr#L372" target="_blank">View source</a>]
         
       </div>
     </div>
