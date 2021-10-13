@@ -22,15 +22,11 @@ However, there are times when one might want to create method aliases. It is cer
 
 ## Usage
 
+See the [complete documentation](https://wyhaines.github.io/alias_method.cr/toplevel.html) for full information on this shard and how to use it.
+
 ```crystal
 require "alias_method"
-```
 
-The `alias_method(to, from, yield_arity)` macro is used to create method aliases. For most usage, only the `to` and the `from` arguments are required. The `yield_arity` argument is optional, only applies when aliasing a method that yields, and defaults to `0`.
-
-When a method contains a `yield` statement, that method accepts a block. However, because the block is not captured, the macro does not know what the expected call signature of the block is. So, when it constructs the block forwarding code, it has no way of knowing how many arguments the code expects the block to have. So, when aliasing methods that yield, one must provide that arity information to the macro if the arity is anything other than zero.
-
-```crystal
 class MyClass
   def self.add(x, y)
     x + y

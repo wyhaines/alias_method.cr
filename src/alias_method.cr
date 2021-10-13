@@ -1,6 +1,9 @@
 module AliasMethod
   VERSION = "0.1.0"
 
+  # When an alias is created, the macro will assign an annotation to it that
+  # does the double duty of clearly marking that a method is an alias, and also
+  # carrying a pointer back to the canonical method, in the `:parent` key.
   annotation Alias; end
 end
 
@@ -9,18 +12,21 @@ end
 class NoMethodError < Exception
 end
 
-# The `alias_method(to, from, yield_arity)` macro is used to create method
-# aliases. For most usage, only the `to` and the `from` arguments are
-# required. The `yield_arity` argument is optional, only applies when
-# aliasing a method that yields, and defaults to `0`.
+# The `alias_method` macro is used to create method aliases.
 #
-# When a method contains a `yield` statement, that method accepts a block.
-# However, because the block is not captured, the macro does not know what
-# the expected call signature of the block is. So, when it constructs the
-# block forwarding code, it has no way of knowing how many arguments the
-# code expects the block to have. So, when aliasing methods that yield, one
-# must provide that arity information to the macro if the arity is anything
-# other than zero.
+# Macro arguments:
+#
+# * `new`: the alias; the new name for the method. This is required.
+# * `old`: the original method name; this is the method that the alias will point to.
+# * `yield_arity`: the expected arity of the block that the method being aliased will yield to. This argument is optional, and is only required is the aliased method yields, and the block that it yields to is expected to have an arity other than `0`.
+# * `redefine`: normally, when a method is aliased for the first time, a new, canonical copy of it is created, and both the original name and the alias point to the same version of the method. If additional aliases to that same method are created, that canonical version of the method will not be redefined; all aliases will point to the same implementation. When creating alias method chains, however, the aforementioned behavior prevents the formation of a chain of method calls. Each newly created alias will point to the same method. 
+#
+# For example, `alias_method get, :[]` creates an alias from the `[]()` method to
+# the `get()` method.
+#
+# The methods to be aliased can be specified as symbol literals, string literals, or
+# via direct method references. The macro will not throw any errors if the method
+# being aliased can not be found.For example, consider the following examples:
 #
 # ```
 # class MyClass
@@ -32,44 +38,56 @@ end
 #     yield arg
 #   end
 #
-#   # Spanish translations of the method names:
-#   alias_method "suma", "self.add", 1
-#   alias_method "con", "with"
+#   def [](val)
+#     val ** 3
+#   end
+#
+#   def chain(ary)
+#     ary << "a"
+#   end
+#
+#   alias_method "self.suma", "self.add" # Class method alias
+#   alias_method suma, MyClass.add       # Instance method alias to a class method
+#   alias_method con, :with, 1           # Alias to a method that yields
+#   alias_method cube, :[]               # Alias to a method name that has punctuation
+#   alias_method nada, nothing           # Alias to a method that doesn't exist (no error)
+#
+#   alias_method chain_a, chain          # Create a chain of aliases
+#   def chain(ary)
+#     chain_a(ary) << "b"
+#   end
+#   alias_method chain_b, chain
+#   def chain(ary)
+#      chain_b(ary) << "c"
+#   end
 # end
 #
-# foo = Foo.new
+# foo = MyClass.new
 #
-# puts Foo.suma(123, 456)
-# puts(foo.con(7) do |x|
-#   x ** x
-# end)
-# ```
-#
-# The macro will not throw any errors if the method being aliased can not be
-# found.
+# puts "Call the MyClass.add class method via the class method alias, MyClass.suma: #{MyClass.suma(123, 456)}"
+# puts "Call the MyClass.add class method via the instance method alias, MyClass#suma: #{foo.suma(456, 789)}"
+# puts "Call an alias to a method that takes a block: #{foo.con(7) {|x| x ** x}}"
+# puts "Call a method that forms a chain of aliased methods: #{foo.chain([] of String).inspect}"
 #
 # ```
-# class MyClass
-#   alias_method "nada", "nothing"
-# end
-# ```
-macro alias_method(to, from, yield_arity = 0, redefine = false)
+#
+macro alias_method(new, old, yield_arity = 0, redefine = false)
   {%
-    # Figure out where the _from_ method lives....
+    # Figure out where the _old_ method lives....
 
     method_name = nil
-    if from.class_name == "Call"
+    if old.class_name == "Call"
       # This is the easy way, and the way that the macro should normally be used.
       # The method to lookup is directly referenced in a Call.
-      if from.receiver.is_a?(Nop)
+      if old.receiver.is_a?(Nop)
         receiver = @type
       else
-        receiver = from.receiver.resolve.class
+        receiver = old.receiver.resolve.class
       end
-      method_name = from.name
-    elsif from.includes?(".")
+      method_name = old.name
+    elsif old.includes?(".")
       # It's a class method.
-      receiver_name, method_name = from.split(".")
+      receiver_name, method_name = old.split(".")
 
       if receiver_name == "self"
         receiver = @type.class
@@ -103,53 +121,53 @@ macro alias_method(to, from, yield_arity = 0, redefine = false)
     else
       # It refers to an instance method within the current @type.
       receiver = @type
-      method_name = from
+      method_name = old
     end
 
     # Figure out where the _to_  method lives....
-    to_method_name = nil
-    if to.class_name == "Call"
-      if to.receiver.is_a?(Nop)
-        to_receiver = @type
+    new_method_name = nil
+    if new.class_name == "Call"
+      if new.receiver.is_a?(Nop)
+        new_receiver = @type
       else
-        to_receiver = to.receiver.resolve.class
+        new_receiver = new.receiver.resolve.class
       end
-      to_method_name = to.name
-    elsif to.includes?(".")
-      to_receiver_name, to_method_name = to.split(".")
+      new_method_name = new.name
+    elsif new.includes?(".")
+      new_receiver_name, new_method_name = new.split(".")
 
-      if to_receiver_name == "self"
-        to_receiver = @type.class
+      if new_receiver_name == "self"
+        new_receiver = @type.class
       else
-        to_receiver = nil
+        new_receiver = nil
         search_paths = [@top_level]
         search_paths << @type.class unless receiver_name[0..1] == "::"
 
         search_paths.each do |search_path|
-          unless to_receiver
-            found_the_to_receiver = true
-            parts = to_receiver_name.split("::")
+          unless new_receiver
+            found_the_new_receiver = true
+            parts = new_receiver_name.split("::")
             parts.each do |part|
-              if found_the_to_receiver
+              if found_the_new_receiver
                 constant_id = search_path.constants.find { |c| c.id == part }
                 if !constant_id
-                  found_the_to_receiver = false
+                  found_the_new_receiver = false
                 else
                   search_path = search_path.constant(constant_id)
-                  found_the_to_receiver = false if search_path.nil?
+                  found_the_new_receiver = false if search_path.nil?
                 end
               end
             end
 
-            if found_the_to_receiver
-              to_receiver = search_path.class
+            if found_the_new_receiver
+              new_receiver = search_path.class
             end
           end
         end
       end
     else
-      to_receiver = @type
-      to_method_name = to
+      new_receiver = @type
+      new_method_name = new
     end
   %}
   {%
@@ -160,7 +178,6 @@ macro alias_method(to, from, yield_arity = 0, redefine = false)
   {%
     skip_origin = false
     # If the original method already has a new name, don't create it again.
-    pp method.annotations(AliasMethod::Alias)
     if ann = method.annotation(AliasMethod::Alias)
       if ann[:parent]
         skip_origin = true
@@ -289,7 +306,7 @@ macro alias_method(to, from, yield_arity = 0, redefine = false)
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
-           to_receiver == @type ? "".id : "#{to_receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id
+           new_receiver == @type ? "".id : "#{new_receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id
          }}{{
              method_name.id
            }}{{
@@ -310,9 +327,9 @@ macro alias_method(to, from, yield_arity = 0, redefine = false)
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
-           to_receiver == @type ? "".id : "#{to_receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id
+           new_receiver == @type ? "".id : "#{new_receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id
          }}{{
-             to_method_name.id
+             new_method_name.id
            }}{{
                !method_args.empty? ? "(".id : "".id
              }}{{
@@ -369,18 +386,18 @@ end
 #   alias_method "self.instructions_per_second", "self.ips"
 # end
 # ```
-macro remove_method(from)
+macro remove_method(old)
   {%
     method_name = nil
-    if from.class_name == "Call"
-      if from.receiver.is_a?(Nop)
+    if old.class_name == "Call"
+      if old.receiver.is_a?(Nop)
         receiver = @type
       else
-        receiver = from.receiver.resolve.class
+        receiver = old.receiver.resolve.class
       end
-      method_name = from.name
-    elsif from.includes?(".")
-      receiver_name, method_name = from.split(".")
+      method_name = old.name
+    elsif old.includes?(".")
+      receiver_name, method_name = old.split(".")
 
       if receiver_name == "self"
         receiver = @type.class
@@ -413,7 +430,7 @@ macro remove_method(from)
       end
     else
       receiver = @type
-      method_name = from
+      method_name = old
     end
   %}
 
