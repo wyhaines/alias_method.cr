@@ -36,25 +36,36 @@ class MyClass
     yield arg
   end
 
-  # Spanish translations of the method names:
-  alias_method "suma", "self.add", 1
-  alias_method "con", "with"
+  def [](val)
+    val ** 3
+  end
+
+  def chain(ary)
+    ary << "a"
+  end
+
+  alias_method "self.suma", "self.add" # Class method alias
+  alias_method suma, MyClass.add       # Instance method alias to a class method
+  alias_method con, :with, 1           # Alias to a method that yields
+  alias_method cube, :[]               # Alias to a method name that has punctuation
+  alias_method nada, nothing           # Alias to a method that doesn't exist (no error)
+
+  alias_method chain_a, chain          # Create a chain of aliases
+  def chain(ary)
+    chain_a(ary) << "b"
+  end
+  alias_method chain_b, chain
+  def chain(ary)
+     chain_b(ary) << "c"
+  end
 end
 
-foo = Foo.new
+foo = MyClass.new
 
-puts Foo.suma(123, 456)
-puts(foo.con(7) do |x|
-  x ** x
-end)
-```
-
-The macro will not throw any errors if the method being aliased can not be found.
-
-```crystal
-class MyClass
-  alias_method "nada", "nothing"
-end
+puts "Call the MyClass.add class method via the class method alias, MyClass.suma: #{MyClass.suma(123, 456)}"
+puts "Call the MyClass.add class method via the instance method alias, MyClass#suma: #{foo.suma(456, 789)}"
+puts "Call an alias to a method that takes a block: #{foo.con(7) {|x| x ** x}}"
+puts "Call a method that forms a chain of aliased methods: #{foo.chain([] of String).inspect}"
 ```
 
 The shard also implements a `remove_method` macro that can be used to (sort of) remove methods. Crystal does not actually provide any ability to truly undefine a method, so this macro redefines the removed method to throw a `NoMethodError` exception.
