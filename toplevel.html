@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="generator" content="Crystal Docs 1.0.0">
+<meta name="generator" content="Crystal Docs 1.1.1">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="alias_method">
 
@@ -137,14 +137,14 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
-        <a href="#alias_method(new,old,yield_arity=0,redefine=false)-macro" class="signature"><strong>alias_method</strong>(new, old, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)</a>
+        <a href="#alias_method%28new%2Cold%2Cyield_arity%3D0%2Credefine%3Dfalse%29-macro" class="signature"><strong>alias_method</strong>(new, old, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)</a>
         
-          <div class="summary"><p>The <code><a href="toplevel.html#alias_method(new,old,yield_arity=0,redefine=false)-macro">alias_method</a></code> macro is used to create method aliases.</p></div>
+          <div class="summary"><p>The <code><a href="toplevel.html#alias_method%28new%2Cold%2Cyield_arity%3D0%2Credefine%3Dfalse%29-macro">alias_method</a></code> macro is used to create method aliases.</p></div>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#remove_method(old)-macro" class="signature"><strong>remove_method</strong>(old)</a>
+        <a href="#remove_method%28old%29-macro" class="signature"><strong>remove_method</strong>(old)</a>
         
           <div class="summary"><p>This macro removes a method.</p></div>
         
@@ -179,24 +179,24 @@
         
         macro <strong>alias_method</strong>(new, old, yield_arity = <span class="n">0</span>, redefine = <span class="n">false</span>)
 
-        <a class="method-permalink" href="#alias_method(new,old,yield_arity=0,redefine=false)-macro">#</a>
+        <a class="method-permalink" href="#alias_method%28new%2Cold%2Cyield_arity%3D0%2Credefine%3Dfalse%29-macro">#</a>
       </div>
       
         <div class="doc">
           
-          <p>The <code><a href="toplevel.html#alias_method(new,old,yield_arity=0,redefine=false)-macro">alias_method</a></code> macro is used to create method aliases.</p>
-
+          <p>The <code><a href="toplevel.html#alias_method%28new%2Cold%2Cyield_arity%3D0%2Credefine%3Dfalse%29-macro">alias_method</a></code> macro is used to create method aliases.</p>
 <p>Macro arguments:</p>
-
-<ul><li><code>new</code>: the alias; the new name for the method. This is required.</li><li><code>old</code>: the original method name; this is the method that the alias will point to.</li><li><code>yield_arity</code>: the expected arity of the block that the method being aliased will yield to. This argument is optional, and is only required is the aliased method yields, and the block that it yields to is expected to have an arity other than <code>0</code>.</li><li><code>redefine</code>: normally, when a method is aliased for the first time, a new, canonical copy of it is created, and both the original name and the alias point to the same version of the method. If additional aliases to that same method are created, that canonical version of the method will not be redefined; all aliases will point to the same implementation. When creating alias method chains, however, the aforementioned behavior prevents the formation of a chain of method calls. Each newly created alias will point to the same method.</li></ul>
-
+<ul>
+<li><code>new</code>: the alias; the new name for the method. This is required.</li>
+<li><code>old</code>: the original method name; this is the method that the alias will point to.</li>
+<li><code>yield_arity</code>: the expected arity of the block that the method being aliased will yield to. This argument is optional, and is only required is the aliased method yields, and the block that it yields to is expected to have an arity other than <code>0</code>.</li>
+<li><code>redefine</code>: normally, when a method is aliased for the first time, a new, canonical copy of it is created, and both the original name and the alias point to the same version of the method. If additional aliases to that same method are created, that canonical version of the method will not be redefined; all aliases will point to the same implementation. When creating alias method chains, however, the aforementioned behavior prevents the formation of a chain of method calls. Each newly created alias will point to the same method.</li>
+</ul>
 <p>For example, <code>alias_method get, :[]</code> creates an alias from the <code>[]()</code> method to
 the <code>get()</code> method.</p>
-
 <p>The methods to be aliased can be specified as symbol literals, string literals, or
 via direct method references. The macro will not throw any errors if the method
 being aliased can not be found.For example, consider the following examples:</p>
-
 <pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
   <span class="k">def</span> <span class="m">self</span>.add(x, y)
     x <span class="o">+</span> y
@@ -242,7 +242,7 @@ puts <span class="s">&quot;Call a method that forms a chain of aliased methods: 
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/70a75ae276503035a2e95c6fe1928b3d0633c674/src/alias_method.cr#L74" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/5c4fe2dc63ba5ce50aa695e03c82454a81151821/src/alias_method.cr#L74" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -252,7 +252,7 @@ puts <span class="s">&quot;Call a method that forms a chain of aliased methods: 
         
         macro <strong>remove_method</strong>(old)
 
-        <a class="method-permalink" href="#remove_method(old)-macro">#</a>
+        <a class="method-permalink" href="#remove_method%28old%29-macro">#</a>
       </div>
       
         <div class="doc">
@@ -260,15 +260,12 @@ puts <span class="s">&quot;Call a method that forms a chain of aliased methods: 
           <p>This macro removes a method. It is not possible to actually undefined
 a method in Crystal, so this macro redefines the method to return, at
 runtime, a NoMethodError exception.</p>
-
 <p>Method removal works on both class methods and instance methods.
 If you have a method chain that has been created through multiple layers
 of methods, and one of the links in the middle of the chain is removed,
 it will break the chain, so be careful with that.</p>
-
 <p>Methods to be removed can be specified directly, through StringLiterals,
 or through Symbol literals, just like alias_method.</p>
-
 <pre><code class="language-crystal"><span class="k">class</span> <span class="t">Foo</span>
   <span class="k">def</span> <span class="m">original_method</span>
     <span class="s">&quot;do method stuff&quot;</span>
@@ -286,9 +283,7 @@ or through Symbol literals, just like alias_method.</p>
 
   <span class="c"># Use a symbol:</span>
   remove_method <span class="n">:copy_original_method</span></code></pre>
-
 <p>This can be convenient when aliasing class methods.</p>
-
 <pre><code class="language-crystal"><span class="k">module</span> <span class="t">Benchmark</span>
   alias_method <span class="s">&quot;self.instructions_per_second&quot;</span>, <span class="s">&quot;self.ips&quot;</span>
 <span class="k">end</span></code></pre>
@@ -297,7 +292,7 @@ or through Symbol literals, just like alias_method.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/wyhaines/alias_method.cr/blob/70a75ae276503035a2e95c6fe1928b3d0633c674/src/alias_method.cr#L389" target="_blank">View source</a>]
+          [<a href="https://github.com/wyhaines/alias_method.cr/blob/5c4fe2dc63ba5ce50aa695e03c82454a81151821/src/alias_method.cr#L389" target="_blank">View source</a>]
         
       </div>
     </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="generator" content="Crystal Docs 1.0.0">
+<meta name="generator" content="Crystal Docs 1.1.1">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="alias_method">
 
@@ -83,46 +83,38 @@
 
 
 <div class="main-content">
-<p><img src="https://img.shields.io/github/workflow/status/wyhaines/alias_method.cr/Alias_Method.cr%20CI?style=for-the-badge&logo=GitHub" alt="Alias_Method.cr CI"/>
-<a href="https://github.com/wyhaines/alias_method.cr/releases"><img src="https://img.shields.io/github/release/wyhaines/alias_method.cr.svg?style=for-the-badge" alt="GitHub release"/></a>
-<img src="https://img.shields.io/github/commits-since/wyhaines/alias_method.cr/latest?style=for-the-badge" alt="GitHub commits since latest release (by SemVer)"/></p>
-
-<h1><a id="alias-method.crhttpswyhaines.github.ioalias-method.cr" class="anchor" href="#alias-method.crhttpswyhaines.github.ioalias-method.cr">
+<p><img src="https://img.shields.io/github/workflow/status/wyhaines/alias_method.cr/Alias_Method.cr%20CI?style=for-the-badge&amp;logo=GitHub" alt="Alias_Method.cr CI" />
+<a href="https://github.com/wyhaines/alias_method.cr/releases"><img src="https://img.shields.io/github/release/wyhaines/alias_method.cr.svg?style=for-the-badge" alt="GitHub release" /></a>
+<img src="https://img.shields.io/github/commits-since/wyhaines/alias_method.cr/latest?style=for-the-badge" alt="GitHub commits since latest release (by SemVer)" /></p>
+<h1><a id="alias-method.cr" class="anchor" href="#alias-method.cr">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a><a href="https://wyhaines.github.io/alias_method.cr/">Alias_Method.cr</a></h1>
-
 <p>Crystal does not natively support the creation of method aliases. This is by design, and the general philosophy of the language is that any given method should only be called by a single name.</p>
-
 <p>However, there are times when one might want to create method aliases. It is certainly possible to hand-write code to do this, but this shard provides a single-line way of aliasing a method. It works for both instance methods and for class methods.</p>
-
 <h2><a id="installation" class="anchor" href="#installation">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Installation</h2>
-
-<ol><li>Add the dependency to your <code>shard.yml</code>:</li></ol>
-
-<p><code></code>`yaml
-   dependencies:</p>
-
-<pre><code class="language-crystal"> alias_method:
-   github: wyhaines/alias_method.cr</code></pre>
-
-<p><code></code>`</p>
-
-<ol><li>Run <code>shards install</code></li></ol>
-
+<ol>
+<li>
+<p>Add the dependency to your <code>shard.yml</code>:</p>
+<pre><code class="language-yaml">dependencies:
+  alias_method:
+    github: wyhaines/alias_method.cr</code></pre>
+</li>
+<li>
+<p>Run <code>shards install</code></p>
+</li>
+</ol>
 <h2><a id="usage" class="anchor" href="#usage">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Usage</h2>
-
 <p>See the <a href="https://wyhaines.github.io/alias_method.cr/toplevel.html">complete documentation</a> for full information on this shard and how to use it.</p>
-
 <pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;alias_method&quot;</span>
 
 <span class="k">class</span> <span class="t">MyClass</span>
@@ -164,9 +156,7 @@ puts <span class="s">&quot;Call the MyClass.add class method via the class metho
 puts <span class="s">&quot;Call the MyClass.add class method via the instance method alias, MyClass#suma: </span><span class="i">#{</span>foo.suma(<span class="n">456</span>, <span class="n">789</span>)<span class="i">}</span><span class="s">&quot;</span>
 puts <span class="s">&quot;Call an alias to a method that takes a block: </span><span class="i">#{</span>foo.con(<span class="n">7</span>) {<span class="o">|</span>x<span class="o">|</span> x <span class="o">**</span> x<span class="i">}</span><span class="s">}&quot;</span>
 puts <span class="s">&quot;Call a method that forms a chain of aliased methods: </span><span class="i">#{</span>foo.chain(<span class="o">[]</span> <span class="k">of</span> <span class="t">String</span>).inspect<span class="i">}</span><span class="s">&quot;</span></code></pre>
-
-<p>The shard also implements a <code><a href="toplevel.html#remove_method(old)-macro">remove_method</a></code> macro that can be used to (sort of) remove methods. Crystal does not actually provide any ability to truly undefine a method, so this macro redefines the removed method to throw a <code><a href="NoMethodError.html">NoMethodError</a></code> exception.</p>
-
+<p>The shard also implements a <code><a href="toplevel.html#remove_method%28old%29-macro">remove_method</a></code> macro that can be used to (sort of) remove methods. Crystal does not actually provide any ability to truly undefine a method, so this macro redefines the removed method to throw a <code><a href="NoMethodError.html">NoMethodError</a></code> exception.</p>
 <pre><code class="language-crystal"><span class="k">class</span> <span class="t">MyClass</span>
   <span class="k">def</span> <span class="m">self</span>.add(x, y)
     x <span class="o">+</span> y
@@ -184,15 +174,12 @@ puts <span class="s">&quot;Call a method that forms a chain of aliased methods: 
   remove_method <span class="s">&quot;with&quot;</span>
   remove_method <span class="s">&quot;self.add&quot;</span>
 <span class="k">end</span></code></pre>
-
 <h2><a id="benchmarks" class="anchor" href="#benchmarks">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Benchmarks</h2>
-
 <p>Aliasing methods has no impact on performance, when compiling in release mode (in development mode, they are approximately 1/2 as fast as unaliased methods).</p>
-
 <pre><code class="language-crystal">--------------------------------          
    bare, aliased, alias 968.52M (  1.03ns) (± 2.71%)  0.0B/op        fastest
 bare, aliased, original 965.20M (  1.04ns) (± 2.67%)  0.0B/op   1.00× slower
@@ -214,35 +201,35 @@ with yield, aliased, original 966.45M (  1.03ns) (± 2.49%)  0.0B/op   1.00× sl
 class method, aliased, original 966.72M (  1.03ns) (± 2.63%)  0.0B/op   1.00× slower
         class method, unaliased 967.43M (  1.03ns) (± 2.27%)  0.0B/op   1.00× slower
 --------------------------------</code></pre>
-
 <p>One interesting thing to note is that there seems to be a very slight bias in benchmark outcomes, based on the order of the code being benchmarked. In general, the first block tends to benchmark very slightly faster than the last, which means that if the order of each of the items in the benchmark is reversed, so that unaliased is first, and the aliased method is last, the above results would likely lean towards unaliased first. However, the effect is very slight. There is no appreciable difference in performance, in release mode code, between an aliased method and an unaliased method.</p>
-
 <h2><a id="development" class="anchor" href="#development">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Development</h2>
-
 <p>If you wish to contribute to this shard, please fork the repository, and work from a branch within your own fork. When your work is complete (and has appropriate specs), submit a PR. Thank you!</p>
-
 <h2><a id="contributing" class="anchor" href="#contributing">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Contributing</h2>
-
-<ol><li>Fork it (&lt;https://github.com/wyhaines/alias_method/fork>)</li><li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li><li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li><li>Push to the branch (<code>git push origin my-new-feature</code>)</li><li>Create a new Pull Request</li></ol>
-
+<ol>
+<li>Fork it (<a href="https://github.com/wyhaines/alias_method/fork">https://github.com/wyhaines/alias_method/fork</a>)</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create a new Pull Request</li>
+</ol>
 <h2><a id="contributors" class="anchor" href="#contributors">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Contributors</h2>
-
-<ul><li><a href="https://github.com/wyhaines">Kirk Haines</a> - creator and maintainer</li></ul>
-
-<p><img src="https://img.shields.io/github/languages/code-size/wyhaines/alias_method.cr?style=for-the-badge" alt="GitHub code size in bytes"/>
-<img src="https://img.shields.io/github/issues/wyhaines/alias_method.cr?style=for-the-badge" alt="GitHub issues"/></p>
+<ul>
+<li><a href="https://github.com/wyhaines">Kirk Haines</a> - creator and maintainer</li>
+</ul>
+<p><img src="https://img.shields.io/github/languages/code-size/wyhaines/alias_method.cr?style=for-the-badge" alt="GitHub code size in bytes" />
+<img src="https://img.shields.io/github/issues/wyhaines/alias_method.cr?style=for-the-badge" alt="GitHub issues" /></p>
 </div>
 </body>
 </html>
