@@ -68,6 +68,10 @@ class AliasTestClass
     args
   end
 
+  def with_double_splat(x, **other)
+    {x, other}
+  end
+
   def bare_and_remove
     "There can be only one."
   end
@@ -101,6 +105,7 @@ class AliasTestClass
   alias_method new_with_arg_and_capture_and_return_type, with_arg_and_capture_and_return_type
   alias_method new_with_yield, with_yield, 1
   alias_method new_with_splat, with_splat
+  alias_method new_with_double_splat, with_double_splat
 
   alias_method "new_bare_and_remove", "bare_and_remove"
   alias_method just_remove_me, bare_and_remove

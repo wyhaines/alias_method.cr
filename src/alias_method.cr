@@ -197,6 +197,13 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
       method_arg_names[si] = "*#{method_arg_names[si]}"
     end
 
+    # Double splats also have to be specially handled. They come at the end of the
+    # argument list, but before any block arg.
+    if ds = method.double_splat
+      method_args << "**#{method.double_splat}"
+      method_arg_names << "**#{method.double_splat.name}"
+    end
+
     block_arg_arity = nil
     block_arg_ary = [] of String
     block_arg_list = ""
@@ -205,7 +212,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
 
     if method.accepts_block?
       if method.block_arg
-        block_arg = "&#{method.block_arg.id}".id
+        block_arg = "&#{method.block_arg.id}"
         block_arg_name = "&#{method.block_arg.name.id}"
         method_args << block_arg
         method_arg_names << block_arg_name

@@ -69,6 +69,13 @@ describe AliasMethod do
     test.new_with_splat(1,2,3).should eq expected_answer
   end
 
+  it "can alias a method that has a double splat argument" do
+    expected_answer = {123, {data: 456}}
+
+    test.with_double_splat(123, data: 456).should eq expected_answer
+    test.new_with_double_splat(123, data: 456).should eq expected_answer
+  end
+
   it "can alias a method that captures a block and has a typed return value" do
     test.with_arg_and_capture(7) { |x| x*x }.should eq 49
     test.new_with_arg_and_capture(8) { |x| x*x }.should eq 64
