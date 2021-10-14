@@ -76,6 +76,16 @@ describe AliasMethod do
     test.new_with_double_splat(123, data: 456).should eq expected_answer
   end
 
+  it "can alias a method that uses splats, double splats, and blocks" do
+    test.with_all_the_special_stuff("x", data: 456) do |s, ds|
+      next s[0], ds[:data]
+    end.should eq ({"x", 456})
+
+    test.new_with_all_the_special_stuff("x", data: 456) do |s, ds|
+      next s[0], ds[:data]
+    end.should eq ({"x", 456})
+  end
+
   it "can alias a method that captures a block and has a typed return value" do
     test.with_arg_and_capture(7) { |x| x*x }.should eq 49
     test.new_with_arg_and_capture(8) { |x| x*x }.should eq 64

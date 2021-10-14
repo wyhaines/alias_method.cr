@@ -72,6 +72,13 @@ class AliasTestClass
     {x, other}
   end
 
+  def with_all_the_special_stuff(
+    *args,
+    **dargs,
+    &block : Tuple(String),NamedTuple(data: Int32) -> Tuple(String, Int32))
+    block.call(args, dargs)
+  end
+
   def bare_and_remove
     "There can be only one."
   end
@@ -106,6 +113,7 @@ class AliasTestClass
   alias_method new_with_yield, with_yield, 1
   alias_method new_with_splat, with_splat
   alias_method new_with_double_splat, with_double_splat
+  alias_method new_with_all_the_special_stuff, with_all_the_special_stuff
 
   alias_method "new_bare_and_remove", "bare_and_remove"
   alias_method just_remove_me, bare_and_remove
