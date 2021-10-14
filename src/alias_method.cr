@@ -169,8 +169,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
       new_receiver = @type
       new_method_name = new
     end
-  %}
-  {%
+
     new_name = nil
     methods = receiver ? receiver.methods.select { |m| m.name.id == method_name } : [] of Nil
   %}
@@ -261,9 +260,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
         new_name = new_name.gsub(punctuation, label.stringify)
       end
     end
-  %}
 
-  {%
     alias_method_call = [
       receiver == @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id ,
       new_name.id,
