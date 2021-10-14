@@ -64,6 +64,10 @@ class AliasTestClass
     yield arg
   end
 
+  def with_splat(*args)
+    args
+  end
+
   def bare_and_remove
     "There can be only one."
   end
@@ -84,30 +88,31 @@ class AliasTestClass
     ary << "a"
   end
 
-  alias_method("new_get", "[]")
+  alias_method "new_get", "[]"
   alias_method also_new_get, :[]
-  alias_method(new_bare, bare)
-  alias_method("new_bare_with_return_type", "bare_with_return_type")
-  alias_method("new_with_args", "with_args")
-  alias_method(:new_with_args_and_return_type, :with_args_and_return_type)
-  alias_method("new_with_typed_args", "with_typed_args")
-  alias_method("new_with_typed_args_and_return_type", "with_typed_args_and_return_type")
-  alias_method("new_with_capture", "with_capture")
-  alias_method("new_with_arg_and_capture", "with_arg_and_capture")
-  alias_method("new_with_arg_and_capture_and_return_type", "with_arg_and_capture_and_return_type")
-  alias_method("new_with_yield", "with_yield", 1)
+  alias_method new_bare, bare
+  alias_method new_bare_with_return_type, bare_with_return_type
+  alias_method new_with_args, with_args
+  alias_method :new_with_args_and_return_type, :with_args_and_return_type
+  alias_method new_with_typed_args, with_typed_args
+  alias_method new_with_typed_args_and_return_type, with_typed_args_and_return_type
+  alias_method new_with_capture, "with_capture"
+  alias_method new_with_arg_and_capture, with_arg_and_capture
+  alias_method new_with_arg_and_capture_and_return_type, with_arg_and_capture_and_return_type
+  alias_method new_with_yield, with_yield, 1
+  alias_method new_with_splat, with_splat
 
-  alias_method("new_bare_and_remove", "bare_and_remove")
-  alias_method(just_remove_me, bare_and_remove)
+  alias_method "new_bare_and_remove", "bare_and_remove"
+  alias_method just_remove_me, bare_and_remove
   remove_method :bare_and_remove
   remove_method just_remove_me
 
-  alias_method(AliasTestClass.new_bare_class_method, AliasTestClass.bare_class_method)
-  alias_method("self.new_other_bare_class_method", "self.other_bare_class_method")
+  alias_method AliasTestClass.new_bare_class_method, AliasTestClass.bare_class_method
+  alias_method "self.new_other_bare_class_method", "self.other_bare_class_method"
 
-  alias_method(new_bare_crossclass, CrossClassAliasTest.bare_crossclass)
+  alias_method new_bare_crossclass, CrossClassAliasTest.bare_crossclass
 
-  alias_method(new_explicitly_private, explicitly_private)
+  alias_method new_explicitly_private, explicitly_private
 
   alias_method chain_a, chain, redefine: true
 
