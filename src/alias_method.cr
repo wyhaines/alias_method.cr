@@ -187,26 +187,24 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
 
     method_args = method.args
     method_arg_names = method.args.map &.name.id
-    if method.accepts_block? && method.block_arg
-      block_arg = "&#{method.block_arg.id}".id
-      block_arg_name = "&#{method.block_arg.name.id}"
-    else
-      block_arg = nil
-      block_arg_name = nil
-    end
-
-    if block_arg
-      method_args << block_arg
-      method_arg_names << block_arg_name
-    end
-
     block_arg_arity = nil
     block_arg_ary = [] of String
     block_arg_list = ""
     block_call_list = ""
     block_type = nil
+
     if method.accepts_block?
-      block_type = method.block_arg ? "block" : "yield"
+      if method.block_arg
+        block_arg = "&#{method.block_arg.id}".id
+        block_arg_name = "&#{method.block_arg.name.id}"
+        method_args << block_arg
+        method_arg_names << block_arg_name
+        block_type = "block"
+      else
+        block_arg = nil
+        block_arg_name = nil
+        block_type = "yield"
+      end
 
       # If you are reading this code, the block below is because we need
       # construct a list of variable names, for any block arity that the
