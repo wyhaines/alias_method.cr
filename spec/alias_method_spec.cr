@@ -66,7 +66,7 @@ describe AliasMethod do
     expected_answer = {1, 2, 3}
 
     test.with_splat(1,2,3).should eq expected_answer
-    #test.new_with_splat(1,2,3).should eq expected_answer
+    test.new_with_splat(1,2,3).should eq expected_answer
   end
 
   it "can alias a method that captures a block and has a typed return value" do

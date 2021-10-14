@@ -166,6 +166,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
         end
       end
     else
+      # It refers to an instance method within the current @type.
       new_receiver = @type
       new_method_name = new
     end
@@ -186,6 +187,16 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
 
     method_args = method.args
     method_arg_names = method.args.map &.name.id
+
+    # If there is a splat argument, more work is necessary. The array of arguments
+    # returned by `#args` doesn't reflect which one may be a splat. There is a
+    # separate method, `#splat_index`, which returns the index of the splat argument,
+    # if one exists.
+    if si = method.splat_index
+      method_args[si] = "*#{method_args[si]}"
+      method_arg_names[si] = "*#{method_arg_names[si]}"
+    end
+
     block_arg_arity = nil
     block_arg_ary = [] of String
     block_arg_list = ""
