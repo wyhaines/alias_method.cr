@@ -204,22 +204,15 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
       method_arg_names << "**#{method.double_splat.name}"
     end
 
-    block_arg_arity = nil
-    block_arg_ary = [] of String
     block_arg_list = ""
     block_call_list = ""
-    block_type = nil
 
     if method.accepts_block?
       if method.block_arg
-        block_arg = "&#{method.block_arg.id}"
-        block_arg_name = "&#{method.block_arg.name.id}"
-        method_args << block_arg
-        method_arg_names << block_arg_name
+        method_args << "&#{method.block_arg.id}"
+        method_arg_names << "&#{method.block_arg.name.id}"
         block_type = "block"
       else
-        block_arg = nil
-        block_arg_name = nil
         block_type = "yield"
       end
 
@@ -232,6 +225,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
       block_arg_arity = block_type == "block" ? (left.split(",").reject(&.empty?).size - 1) : (yield_arity - 1)
 
       if block_arg_arity > -1
+        block_arg_ary = [] of String
         letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
         (0..block_arg_arity).each do |n|
           block_arg = ""
@@ -288,7 +282,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
       method.accepts_block? && (block_type == "yield") ? "{#{block_arg_list.id} yield(#{block_call_list.id})}".id : "".id
     ].join("")
 
-    fqnn = [
+    fully_qualified_method_name = [
       @type ? "".id : "#{receiver.id.gsub(/\.class/, "").gsub(/:Module/, "")}.".id,
       new_name.id
     ].join("")
@@ -315,7 +309,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
   end
 
   # Create the aliases.
-  @[AliasMethod::Alias(parent: {{ fqnn }})]
+  @[AliasMethod::Alias(parent: {{ fully_qualified_method_name }})]
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
@@ -336,7 +330,7 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
   end
   {% end %}
 
-  @[AliasMethod::Alias(parent: {{ fqnn }})]
+  @[AliasMethod::Alias(parent: {{ fully_qualified_method_name }})]
   {{
     method.visibility.id == "public" ? "".id : method.visibility.id
   }} def {{
