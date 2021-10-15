@@ -228,7 +228,6 @@ macro alias_method(new, old, yield_arity = 0, redefine = false)
         block_arg_ary = [] of String
         letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
         (0..block_arg_arity).each do |n|
-          block_arg = ""
           work = n
           block_arg = letters[work % 26]
           work = (work // 26) - 1
